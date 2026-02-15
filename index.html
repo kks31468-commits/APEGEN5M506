@@ -3,210 +3,424 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Classroom Info Hub - ม.5/6</title>
+    <title>ClassHub - ม.5/6 iOS Glass UI</title>
     <script src="https://cdn.tailwindcss.com"></script>
-    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
     <link href="https://fonts.googleapis.com/css2?family=Sarabun:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Sarabun', 'sans-serif'],
+                    },
+                    colors: {
+                        primary: '#007AFF', // iOS Blue
+                        secondary: '#5856D6', // iOS Purple
+                    }
+                }
+            }
+        }
+    </script>
     <style>
         body {
-            font-family: 'Sarabun', sans-serif;
-            background-color: #f0f2f5;
+            background-color: #F2F2F7; /* iOS System Gray 6 */
+            background-image: 
+                radial-gradient(at 0% 0%, rgba(0, 122, 255, 0.15) 0px, transparent 50%),
+                radial-gradient(at 100% 0%, rgba(88, 86, 214, 0.15) 0px, transparent 50%),
+                radial-gradient(at 100% 100%, rgba(52, 199, 89, 0.1) 0px, transparent 50%);
+            background-attachment: fixed;
+            -webkit-font-smoothing: antialiased;
         }
-        .nav-active {
-            border-bottom: 3px solid #2563eb;
-            color: #2563eb;
+        
+        /* iOS Glass Effect */
+        .glass-nav {
+            background: rgba(255, 255, 255, 0.65);
+            backdrop-filter: saturate(180%) blur(20px);
+            -webkit-backdrop-filter: saturate(180%) blur(20px);
+            border-bottom: 1px solid rgba(0, 0, 0, 0.05);
         }
-        .embed-container {
+
+        .glass-card {
+            background: rgba(255, 255, 255, 0.7);
+            backdrop-filter: saturate(180%) blur(20px);
+            -webkit-backdrop-filter: saturate(180%) blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.4);
+            box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.07);
+        }
+
+        /* Nav Link Styling */
+        .nav-link {
             position: relative;
-            padding-bottom: 56.25%;
-            height: 0;
-            overflow: hidden;
-            max-width: 100%;
+            color: #8E8E93; /* iOS Gray */
+            transition: color 0.3s ease;
+            z-index: 10;
+            font-weight: 500;
         }
-        .embed-container iframe {
+        
+        .nav-link:hover {
+            color: #007AFF;
+        }
+
+        .nav-active {
+            color: #007AFF; /* iOS Blue */
+            font-weight: 600;
+        }
+
+        /* Sliding Marker Animation */
+        #nav-marker {
             position: absolute;
-            top: 0;
+            bottom: 0; /* Or vertically centered for pill shape */
             left: 0;
-            width: 100%;
+            height: 32px; /* Pill height */
+            background: rgba(255, 255, 255, 0.8);
+            border-radius: 99px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+            transition: all 0.4s cubic-bezier(0.25, 0.8, 0.25, 1);
+            z-index: 1;
+            /* Center vertically */
+            top: 50%;
+            transform: translateY(-50%);
+        }
+
+        /* Timeline Customization */
+        .timeline-line {
+            position: absolute;
+            left: 20px;
+            top: 0;
+            bottom: 0;
+            width: 2px;
+            background: linear-gradient(to bottom, #e5e7eb 0%, #d1d5db 50%, #e5e7eb 100%);
+        }
+
+        .hover-lift {
+            transition: transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1), box-shadow 0.3s ease;
+        }
+        
+        .hover-lift:hover {
+            transform: scale(1.02);
+            box-shadow: 0 10px 30px -10px rgba(0, 0, 0, 0.15);
+        }
+
+        /* Hide Scrollbar */
+        .scrollbar-hide::-webkit-scrollbar {
+            display: none;
+        }
+        .scrollbar-hide {
+            -ms-overflow-style: none;
+            scrollbar-width: none;
+        }
+
+        /* Door Animation */
+        #door-overlay {
+            position: fixed;
+            inset: 0;
+            z-index: 9999;
+            display: flex;
+            pointer-events: none;
+        }
+        #door-overlay.is-transitioning {
+            pointer-events: auto;
+        }
+        .door-panel {
+            width: 50%;
             height: 100%;
-            border-radius: 0.75rem;
+            background: #F2F2F7; /* Match body bg for seamless feel */
+            position: relative;
+            transition: transform 0.8s cubic-bezier(0.83, 0, 0.17, 1);
+            will-change: transform;
+            display: flex;
+            align-items: center;
+            border-right: 1px solid rgba(0,0,0,0.05); /* Subtle seam */
         }
-        /* Custom Scrollbar for Timeline */
-        .timeline-container::-webkit-scrollbar {
-            width: 6px;
+        .door-left {
+            transform: translateX(0);
+            justify-content: flex-end;
         }
-        .timeline-container::-webkit-scrollbar-track {
-            background: #f1f1f1;
+        .door-right {
+            transform: translateX(0);
+            justify-content: flex-start;
+            border-left: 1px solid rgba(0,0,0,0.05);
         }
-        .timeline-container::-webkit-scrollbar-thumb {
-            background: #cbd5e1;
-            border-radius: 3px;
+        .doors-open .door-left { transform: translateX(-100%); }
+        .doors-open .door-right { transform: translateX(100%); }
+        
+        .loading-container {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            z-index: 10000;
+            text-align: center;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+        #door-overlay.is-transitioning .loading-container { opacity: 1; }
+        
+        /* Apple-style spinner */
+        .spinner {
+            width: 40px;
+            height: 40px;
+            position: relative;
+            margin: 0 auto;
+        }
+        .spinner div {
+            transform-origin: 20px 20px;
+            animation: spinner-fade 1.2s linear infinite;
+        }
+        .spinner div:after {
+            content: " ";
+            display: block;
+            position: absolute;
+            top: 3px;
+            left: 18px;
+            width: 4px;
+            height: 10px;
+            border-radius: 20%;
+            background: #8E8E93;
+        }
+        /* Generate 12 blades positions (simple CSS loop approx) */
+        .spinner div:nth-child(1) { transform: rotate(0deg); animation-delay: -1.1s; }
+        .spinner div:nth-child(2) { transform: rotate(30deg); animation-delay: -1.0s; }
+        .spinner div:nth-child(3) { transform: rotate(60deg); animation-delay: -0.9s; }
+        .spinner div:nth-child(4) { transform: rotate(90deg); animation-delay: -0.8s; }
+        .spinner div:nth-child(5) { transform: rotate(120deg); animation-delay: -0.7s; }
+        .spinner div:nth-child(6) { transform: rotate(150deg); animation-delay: -0.6s; }
+        .spinner div:nth-child(7) { transform: rotate(180deg); animation-delay: -0.5s; }
+        .spinner div:nth-child(8) { transform: rotate(210deg); animation-delay: -0.4s; }
+        .spinner div:nth-child(9) { transform: rotate(240deg); animation-delay: -0.3s; }
+        .spinner div:nth-child(10) { transform: rotate(270deg); animation-delay: -0.2s; }
+        .spinner div:nth-child(11) { transform: rotate(300deg); animation-delay: -0.1s; }
+        .spinner div:nth-child(12) { transform: rotate(330deg); animation-delay: 0s; }
+        @keyframes spinner-fade {
+            0% { opacity: 1; }
+            100% { opacity: 0; }
+        }
+
+        /* Tab Content Animation */
+        .tab-content {
+            animation: fadeIn 0.5s cubic-bezier(0.25, 1, 0.5, 1);
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: scale(0.98) translateY(10px); }
+            to { opacity: 1; transform: scale(1) translateY(0); }
         }
     </style>
 </head>
-<body class="min-h-screen">
+<body class="text-gray-800 antialiased overflow-x-hidden">
 
-    <!-- Top Navigation -->
-    <nav class="bg-white shadow-md sticky top-0 z-50">
-        <div class="max-w-7xl mx-auto px-4">
-            <div class="flex justify-between items-center h-16">
-                <div class="flex items-center space-x-2">
-                    <i class="fas fa-university text-blue-600 text-2xl"></i>
-                    <span class="text-xl font-bold text-gray-800">ClassHub ม.5/6</span>
+    <!-- Door Overlay (Updated visual style) -->
+    <div id="door-overlay">
+        <div class="door-panel door-left"></div>
+        <div class="door-panel door-right"></div>
+        <div class="loading-container">
+            <div class="spinner">
+                <div></div><div></div><div></div><div></div><div></div><div></div>
+                <div></div><div></div><div></div><div></div><div></div><div></div>
+            </div>
+            <div class="mt-4 text-gray-500 text-sm font-medium tracking-wide">กำลังโหลด...</div>
+        </div>
+    </div>
+
+    <!-- Navbar -->
+    <nav class="glass-nav sticky top-0 z-50 transition-all duration-300">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between items-center h-16 md:h-20">
+                <!-- Logo -->
+                <div class="flex items-center space-x-3 cursor-pointer" onclick="showSection('home')">
+                    <div class="w-10 h-10 rounded-2xl bg-gradient-to-br from-blue-500 to-indigo-600 flex items-center justify-center text-white shadow-lg shadow-blue-200">
+                        <i class="fas fa-graduation-cap text-lg"></i>
+                    </div>
+                    <div>
+                        <span class="text-lg font-bold text-gray-900 tracking-tight">ClassHub</span>
+                        <span class="text-[10px] block text-gray-500 font-medium tracking-wide uppercase">ม.5/6</span>
+                    </div>
                 </div>
-                <div class="hidden md:flex space-x-8">
-                    <a href="javascript:void(0)" onclick="showSection('home')" class="nav-link nav-active py-5 font-medium" id="link-home">หน้าหลัก</a>
-                    <a href="javascript:void(0)" onclick="showSection('schedule')" class="nav-link py-5 font-medium text-gray-500 hover:text-blue-600" id="link-schedule">ตารางเรียน</a>
-                    <a href="javascript:void(0)" onclick="showSection('calendar')" class="nav-link py-5 font-medium text-gray-500 hover:text-blue-600" id="link-calendar">ปฏิทินกิจกรรม</a>
-                    <a href="javascript:void(0)" onclick="showSection('students')" class="nav-link py-5 font-medium text-gray-500 hover:text-blue-600" id="link-students">รายชื่อนักเรียน</a>
+
+                <!-- Desktop Menu with Sliding Marker -->
+                <div class="hidden md:flex items-center relative bg-gray-100/50 rounded-full p-1 border border-gray-200/50 backdrop-blur-sm">
+                    <div id="nav-marker"></div> <!-- Sliding Background -->
+                    <a href="javascript:void(0)" onclick="showSection('home')" class="nav-link px-6 py-1.5 rounded-full" id="link-home">หน้าหลัก</a>
+                    <a href="javascript:void(0)" onclick="showSection('schedule')" class="nav-link px-6 py-1.5 rounded-full" id="link-schedule">ตารางเรียน</a>
+                    <a href="javascript:void(0)" onclick="showSection('calendar')" class="nav-link px-6 py-1.5 rounded-full" id="link-calendar">ปฏิทิน</a>
+                    <a href="javascript:void(0)" onclick="showSection('students')" class="nav-link px-6 py-1.5 rounded-full" id="link-students">รายชื่อเพื่อน</a>
                 </div>
+
                 <!-- Mobile Menu Button -->
                 <div class="md:hidden">
-                    <button onclick="toggleMobileMenu()" class="text-gray-500 hover:text-blue-600 focus:outline-none p-2">
-                        <i class="fas fa-bars text-xl"></i>
+                    <button onclick="toggleMobileMenu()" class="p-2 rounded-full bg-gray-100/80 text-gray-600 hover:bg-gray-200 focus:outline-none transition-colors">
+                        <i class="fas fa-bars text-lg"></i>
                     </button>
                 </div>
             </div>
         </div>
-        
-        <!-- Mobile Menu Dropdown (Hidden by default) -->
-        <div id="mobile-menu" class="hidden md:hidden bg-white border-t border-gray-100 absolute w-full left-0 shadow-lg">
-            <div class="px-4 pt-2 pb-4 space-y-1">
-                <a href="javascript:void(0)" onclick="showSection('home'); toggleMobileMenu()" class="block py-3 px-3 rounded-lg text-base font-medium text-gray-700 hover:bg-gray-50 hover:text-blue-600">
-                    <i class="fas fa-home mr-2 w-6 text-center"></i> หน้าหลัก
+
+        <!-- Mobile Menu Dropdown -->
+        <div id="mobile-menu" class="hidden md:hidden glass-nav border-t border-gray-100 absolute w-full left-0 shadow-xl origin-top animate-[fadeIn_0.2s_ease-out]">
+            <div class="px-4 pt-4 pb-6 space-y-2">
+                <a href="javascript:void(0)" onclick="showSection('home'); toggleMobileMenu()" class="flex items-center space-x-3 p-3 rounded-2xl bg-white/50 hover:bg-white text-gray-700 hover:text-blue-600 transition-all border border-transparent hover:border-gray-100 hover:shadow-sm">
+                    <div class="w-8 h-8 rounded-xl bg-blue-100 flex items-center justify-center text-blue-600"><i class="fas fa-home text-xs"></i></div>
+                    <span class="font-medium">หน้าหลัก</span>
                 </a>
-                <a href="javascript:void(0)" onclick="showSection('schedule'); toggleMobileMenu()" class="block py-3 px-3 rounded-lg text-base font-medium text-gray-700 hover:bg-gray-50 hover:text-blue-600">
-                    <i class="fas fa-calendar-alt mr-2 w-6 text-center"></i> ตารางเรียน
+                <a href="javascript:void(0)" onclick="showSection('schedule'); toggleMobileMenu()" class="flex items-center space-x-3 p-3 rounded-2xl bg-white/50 hover:bg-white text-gray-700 hover:text-blue-600 transition-all border border-transparent hover:border-gray-100 hover:shadow-sm">
+                    <div class="w-8 h-8 rounded-xl bg-pink-100 flex items-center justify-center text-pink-600"><i class="fas fa-calendar-alt text-xs"></i></div>
+                    <span class="font-medium">ตารางเรียน</span>
                 </a>
-                <a href="javascript:void(0)" onclick="showSection('calendar'); toggleMobileMenu()" class="block py-3 px-3 rounded-lg text-base font-medium text-gray-700 hover:bg-gray-50 hover:text-blue-600">
-                    <i class="fas fa-calendar-check mr-2 w-6 text-center"></i> ปฏิทินกิจกรรม
+                <a href="javascript:void(0)" onclick="showSection('calendar'); toggleMobileMenu()" class="flex items-center space-x-3 p-3 rounded-2xl bg-white/50 hover:bg-white text-gray-700 hover:text-blue-600 transition-all border border-transparent hover:border-gray-100 hover:shadow-sm">
+                    <div class="w-8 h-8 rounded-xl bg-orange-100 flex items-center justify-center text-orange-600"><i class="fas fa-calendar-check text-xs"></i></div>
+                    <span class="font-medium">ปฏิทินกิจกรรม</span>
                 </a>
-                <a href="javascript:void(0)" onclick="showSection('students'); toggleMobileMenu()" class="block py-3 px-3 rounded-lg text-base font-medium text-gray-700 hover:bg-gray-50 hover:text-blue-600">
-                    <i class="fas fa-users mr-2 w-6 text-center"></i> รายชื่อนักเรียน
+                <a href="javascript:void(0)" onclick="showSection('students'); toggleMobileMenu()" class="flex items-center space-x-3 p-3 rounded-2xl bg-white/50 hover:bg-white text-gray-700 hover:text-blue-600 transition-all border border-transparent hover:border-gray-100 hover:shadow-sm">
+                    <div class="w-8 h-8 rounded-xl bg-green-100 flex items-center justify-center text-green-600"><i class="fas fa-users text-xs"></i></div>
+                    <span class="font-medium">รายชื่อนักเรียน</span>
                 </a>
             </div>
         </div>
     </nav>
 
-    <div class="max-w-7xl mx-auto px-4 py-8">
+    <!-- Main Content -->
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 md:py-10 min-h-[85vh]">
         
-        <!-- Section: Home -->
+        <!-- SECTION: HOME -->
         <div id="section-home" class="tab-content">
-            <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
-                <!-- Left: Important Info -->
-                <div class="lg:col-span-2 space-y-6">
-                    <div class="bg-gradient-to-r from-blue-600 to-indigo-700 rounded-3xl p-8 text-white shadow-lg">
-                        <h1 class="text-3xl font-bold mb-2">ยินดีต้อนรับสู่บอร์ดข้อมูลห้องเรียน ม.5/6</h1>
-                        <p class="opacity-90">ข้อมูลข่าวสาร ตารางเรียน และปฏิทินกิจกรรม ภาคเรียนที่ 2 ปีการศึกษา 2568</p>
-                        <div class="mt-6 flex space-x-4">
-                            <div class="bg-white/20 p-4 rounded-2xl backdrop-blur-sm">
-                                <p class="text-xs uppercase opacity-75">กิจกรรมถัดไป</p>
-                                <p class="font-bold">สอบปลายภาค 2-6 มี.ค.</p>
-                            </div>
-                            <div class="bg-white/20 p-4 rounded-2xl backdrop-blur-sm">
-                                <p class="text-xs uppercase opacity-75">สถานะวันนี้</p>
-                                <p class="font-bold">เปิดเรียนปกติ</p>
+            <div class="grid grid-cols-1 lg:grid-cols-12 gap-6 md:gap-8">
+                
+                <!-- Welcome Banner -->
+                <div class="lg:col-span-8 space-y-6 md:space-y-8">
+                    <div class="relative overflow-hidden rounded-[32px] bg-white p-8 md:p-12 shadow-2xl shadow-blue-100 border border-white/50">
+                        <!-- Abstract Background -->
+                        <div class="absolute top-0 right-0 w-full h-full bg-gradient-to-br from-blue-50 via-white to-purple-50 opacity-80"></div>
+                        <div class="absolute top-[-50px] right-[-50px] w-64 h-64 rounded-full bg-gradient-to-br from-blue-400 to-indigo-500 blur-3xl opacity-20"></div>
+                        
+                        <div class="relative z-10">
+                            <span class="inline-block py-1.5 px-4 rounded-full bg-white/60 backdrop-blur-md text-xs font-bold text-gray-500 mb-4 border border-white shadow-sm">ภาคเรียนที่ 2 / 2568</span>
+                            <h1 class="text-3xl md:text-5xl font-extrabold mb-4 text-gray-900 tracking-tight leading-tight">ClassHub <span class="text-transparent bg-clip-text bg-gradient-to-r from-blue-600 to-indigo-600">ม.5/6</span></h1>
+                            <p class="text-gray-500 text-lg md:text-xl max-w-xl">ศูนย์กลางข้อมูลข่าวสาร ตารางเรียน และปฏิทินกิจกรรมโรงเรียนขุขันธ์</p>
+                            
+                            <div class="mt-8 flex flex-wrap gap-4">
+                                <div class="bg-white/60 backdrop-blur-xl rounded-2xl p-4 flex items-center border border-white shadow-sm min-w-[160px]">
+                                    <div class="w-10 h-10 rounded-full bg-orange-100 flex items-center justify-center mr-3 text-orange-500 text-xl"><i class="fas fa-calendar-day"></i></div>
+                                    <div>
+                                        <p class="text-[10px] text-gray-400 font-bold uppercase tracking-wider">กิจกรรมถัดไป</p>
+                                        <p class="font-bold text-sm text-gray-800">สอบปลายภาค 2 มี.ค.</p>
+                                    </div>
+                                </div>
+                                <div class="bg-white/60 backdrop-blur-xl rounded-2xl p-4 flex items-center border border-white shadow-sm min-w-[160px]">
+                                    <div class="w-10 h-10 rounded-full bg-green-100 flex items-center justify-center mr-3 text-green-500 text-xl"><i class="fas fa-check-circle"></i></div>
+                                    <div>
+                                        <p class="text-[10px] text-gray-400 font-bold uppercase tracking-wider">สถานะวันนี้</p>
+                                        <p class="font-bold text-sm text-gray-800">เปิดเรียนปกติ</p>
+                                    </div>
+                                </div>
                             </div>
                         </div>
                     </div>
 
-                    <div class="bg-white rounded-2xl p-6 shadow-sm">
-                        <div class="flex justify-between items-center mb-4">
-                            <h2 class="text-xl font-bold flex items-center">
-                                <i class="fas fa-graduation-cap mr-2 text-orange-500"></i> บริการงานวิชาการ (สำหรับนักเรียน)
-                            </h2>
-                            <a href="https://sites.google.com/site/kksvichakarn/" target="_blank" class="text-sm text-blue-600 hover:underline">
-                                <i class="fas fa-external-link-alt"></i> เว็บไซต์หลัก
-                            </a>
+                    <!-- Quick Access Grid -->
+                    <div>
+                        <div class="flex justify-between items-end mb-6 px-2">
+                            <div>
+                                <h2 class="text-2xl font-bold text-gray-900">เมนูลัด</h2>
+                                <p class="text-sm text-gray-500">เข้าถึงบริการต่างๆ ได้อย่างรวดเร็ว</p>
+                            </div>
+                            <a href="javascript:void(0)" onclick="transitionToPage('https://sites.google.com/site/kksvichakarn/')" class="text-blue-500 hover:text-blue-700 text-sm font-semibold transition-colors bg-blue-50 px-3 py-1 rounded-full">เว็บไซต์หลัก <i class="fas fa-chevron-right text-xs ml-1"></i></a>
                         </div>
                         
-                        <!-- Grid เมนูลัดแทน Iframe -->
-                        <div class="grid grid-cols-2 md:grid-cols-3 gap-4">
-                            <!-- Card 1: ลงทะเบียน -->
-                            <a href="http://122.154.155.10/regs/" target="_blank" class="flex flex-col items-center justify-center p-4 bg-orange-50 border border-orange-100 rounded-xl hover:bg-orange-100 transition group">
-                                <div class="w-12 h-12 bg-white rounded-full flex items-center justify-center shadow-sm mb-2 group-hover:scale-110 transition">
-                                    <i class="fas fa-user-edit text-orange-500 text-xl"></i>
+                        <div class="grid grid-cols-2 md:grid-cols-3 gap-4 md:gap-6">
+                            <!-- Card Items with Transition -->
+                            <div onclick="transitionToPage('http://122.154.155.10/regs/')" class="group glass-card rounded-3xl p-6 hover-lift flex flex-col items-center text-center cursor-pointer">
+                                <div class="w-14 h-14 rounded-full bg-orange-100 text-orange-500 flex items-center justify-center text-2xl mb-4 group-hover:scale-110 transition-transform duration-300">
+                                    <i class="fas fa-user-edit"></i>
                                 </div>
-                                <span class="font-bold text-gray-700 text-sm">ลงทะเบียนเรียน</span>
-                            </a>
+                                <h3 class="font-bold text-gray-800">ลงทะเบียนเรียน</h3>
+                                <p class="text-xs text-gray-400 mt-1 font-medium">ระบบงานทะเบียน</p>
+                            </div>
 
-                            <!-- Card 2: SGS -->
-                            <a href="https://sgs.bopp-obec.info/" target="_blank" class="flex flex-col items-center justify-center p-4 bg-blue-50 border border-blue-100 rounded-xl hover:bg-blue-100 transition group">
-                                <div class="w-12 h-12 bg-white rounded-full flex items-center justify-center shadow-sm mb-2 group-hover:scale-110 transition">
-                                    <i class="fas fa-chart-bar text-blue-500 text-xl"></i>
+                            <div onclick="transitionToPage('https://sgs.bopp-obec.info/')" class="group glass-card rounded-3xl p-6 hover-lift flex flex-col items-center text-center cursor-pointer">
+                                <div class="w-14 h-14 rounded-full bg-blue-100 text-blue-500 flex items-center justify-center text-2xl mb-4 group-hover:scale-110 transition-transform duration-300">
+                                    <i class="fas fa-chart-pie"></i>
                                 </div>
-                                <span class="font-bold text-gray-700 text-sm">ตรวจสอบเกรด (SGS)</span>
-                            </a>
+                                <h3 class="font-bold text-gray-800">ตรวจสอบเกรด</h3>
+                                <p class="text-xs text-gray-400 mt-1 font-medium">ระบบ SGS</p>
+                            </div>
 
-                            <!-- Card 3: เว็บไซต์วิชาการ -->
-                            <a href="https://sites.google.com/site/kksvichakarn/" target="_blank" class="flex flex-col items-center justify-center p-4 bg-green-50 border border-green-100 rounded-xl hover:bg-green-100 transition group">
-                                <div class="w-12 h-12 bg-white rounded-full flex items-center justify-center shadow-sm mb-2 group-hover:scale-110 transition">
-                                    <i class="fas fa-globe text-green-500 text-xl"></i>
+                            <div onclick="transitionToPage('https://sites.google.com/site/kksvichakarn/')" class="group glass-card rounded-3xl p-6 hover-lift flex flex-col items-center text-center cursor-pointer">
+                                <div class="w-14 h-14 rounded-full bg-green-100 text-green-500 flex items-center justify-center text-2xl mb-4 group-hover:scale-110 transition-transform duration-300">
+                                    <i class="fas fa-globe"></i>
                                 </div>
-                                <span class="font-bold text-gray-700 text-sm">เว็บไซต์วิชาการ</span>
-                            </a>
+                                <h3 class="font-bold text-gray-800">เว็บไซต์วิชาการ</h3>
+                                <p class="text-xs text-gray-400 mt-1 font-medium">ข้อมูลข่าวสาร</p>
+                            </div>
 
-                            <!-- Card 4: ตารางการใช้ห้องเรียน -->
-                            <a href="https://drive.google.com/drive/folders/1CqiLiKbXor6ZEVU2I-vG6kN_LhHxAK6Q" target="_blank" class="flex flex-col items-center justify-center p-4 bg-purple-50 border border-purple-100 rounded-xl hover:bg-purple-100 transition group">
-                                <div class="w-12 h-12 bg-white rounded-full flex items-center justify-center shadow-sm mb-2 group-hover:scale-110 transition">
-                                    <i class="fas fa-chalkboard-teacher text-purple-500 text-xl"></i>
+                            <div onclick="transitionToPage('https://drive.google.com/drive/folders/1CqiLiKbXor6ZEVU2I-vG6kN_LhHxAK6Q')" class="group glass-card rounded-3xl p-6 hover-lift flex flex-col items-center text-center cursor-pointer">
+                                <div class="w-14 h-14 rounded-full bg-purple-100 text-purple-500 flex items-center justify-center text-2xl mb-4 group-hover:scale-110 transition-transform duration-300">
+                                    <i class="fas fa-door-open"></i>
                                 </div>
-                                <span class="font-bold text-gray-700 text-sm">ตารางการใช้ห้องเรียน</span>
-                            </a>
+                                <h3 class="font-bold text-gray-800">ใช้ห้องเรียน</h3>
+                                <p class="text-xs text-gray-400 mt-1 font-medium">ตารางการใช้ห้อง</p>
+                            </div>
 
-                            <!-- Card 5: ปฏิทินวิชาการ -->
-                            <a href="https://drive.google.com/drive/folders/0B-71egBy6VpfODJ4UDFBTlFnNzQ?resourcekey=0-gR-ZR5JKHEMlCI8Jd7bvaQ" target="_blank" class="flex flex-col items-center justify-center p-4 bg-pink-50 border border-pink-100 rounded-xl hover:bg-pink-100 transition group">
-                                <div class="w-12 h-12 bg-white rounded-full flex items-center justify-center shadow-sm mb-2 group-hover:scale-110 transition">
-                                    <i class="fas fa-calendar-alt text-pink-500 text-xl"></i>
+                            <div onclick="transitionToPage('https://drive.google.com/drive/folders/0B-71egBy6VpfODJ4UDFBTlFnNzQ?resourcekey=0-gR-ZR5JKHEMlCI8Jd7bvaQ')" class="group glass-card rounded-3xl p-6 hover-lift flex flex-col items-center text-center cursor-pointer">
+                                <div class="w-14 h-14 rounded-full bg-pink-100 text-pink-500 flex items-center justify-center text-2xl mb-4 group-hover:scale-110 transition-transform duration-300">
+                                    <i class="fas fa-calendar-day"></i>
                                 </div>
-                                <span class="font-bold text-gray-700 text-sm">ปฏิทินวิชาการ</span>
-                            </a>
+                                <h3 class="font-bold text-gray-800">ปฏิทินวิชาการ</h3>
+                                <p class="text-xs text-gray-400 mt-1 font-medium">Download PDF</p>
+                            </div>
 
-                            <!-- Card 6: รายชื่อนักเรียน -->
-                            <a href="https://docs.google.com/spreadsheets/d/1nNglTKwKrmhzP5x5kNfkjiyls8WXDq9n/edit?gid=1719242929#gid=1719242929" target="_blank" class="flex flex-col items-center justify-center p-4 bg-gray-50 border border-gray-100 rounded-xl hover:bg-gray-100 transition group">
-                                <div class="w-12 h-12 bg-white rounded-full flex items-center justify-center shadow-sm mb-2 group-hover:scale-110 transition">
-                                    <i class="fas fa-users text-gray-500 text-xl"></i>
+                            <div onclick="transitionToPage('https://docs.google.com/spreadsheets/d/1nNglTKwKrmhzP5x5kNfkjiyls8WXDq9n/edit?gid=1719242929#gid=1719242929')" class="group glass-card rounded-3xl p-6 hover-lift flex flex-col items-center text-center cursor-pointer">
+                                <div class="w-14 h-14 rounded-full bg-gray-100 text-gray-600 flex items-center justify-center text-2xl mb-4 group-hover:scale-110 transition-transform duration-300">
+                                    <i class="fas fa-users"></i>
                                 </div>
-                                <span class="font-bold text-gray-700 text-sm">รายชื่อนักเรียน ม.5/6</span>
-                            </a>
+                                <h3 class="font-bold text-gray-800">รายชื่อเพื่อน</h3>
+                                <p class="text-xs text-gray-400 mt-1 font-medium">สมาชิกห้อง ม.5/6</p>
+                            </div>
                         </div>
                     </div>
                 </div>
 
-                <!-- Right: Quick Links / Video Embed -->
-                <div class="space-y-6">
-                    <!-- School Calendar Widget (Mini) -->
-                    <div class="bg-white rounded-2xl p-6 shadow-sm border-l-4 border-red-500">
-                        <h2 class="text-lg font-bold mb-3">📅 ปฏิทินวันนี้</h2>
-                        <div id="today-event-mini" class="text-sm text-gray-600">
-                            <!-- JS will populate this -->
-                            <div class="animate-pulse flex space-x-4">
-                                <div class="flex-1 space-y-2 py-1">
-                                    <div class="h-4 bg-gray-200 rounded w-3/4"></div>
-                                    <div class="h-4 bg-gray-200 rounded"></div>
+                <!-- Right Sidebar -->
+                <div class="lg:col-span-4 space-y-6">
+                    
+                    <!-- Mini Calendar Widget -->
+                    <div class="glass-card rounded-[32px] p-6 relative overflow-hidden group border border-white/60">
+                        <div class="absolute top-0 right-0 w-32 h-32 bg-red-500/5 rounded-bl-[100px] -mr-8 -mt-8 pointer-events-none"></div>
+                        <h2 class="text-lg font-bold text-gray-900 mb-4 flex items-center"><span class="w-1.5 h-6 bg-red-500 rounded-full mr-3"></span>ไฮไลท์วันนี้</h2>
+                        
+                        <div id="today-event-mini" class="bg-white/40 rounded-2xl p-4 border border-white/50 backdrop-blur-sm">
+                             <!-- JS Populated -->
+                             <div class="animate-pulse flex space-x-3">
+                                <div class="flex-1 space-y-2">
+                                    <div class="h-4 bg-gray-200 rounded w-2/3"></div>
+                                    <div class="h-3 bg-gray-200 rounded w-1/2"></div>
                                 </div>
-                            </div>
+                             </div>
                         </div>
-                        <button onclick="showSection('calendar')" class="mt-3 w-full text-center text-red-600 text-xs font-bold hover:underline">ดูปฏิทินทั้งหมด</button>
+                        <button onclick="showSection('calendar')" class="mt-4 w-full py-3 rounded-2xl bg-white text-red-500 font-bold text-sm shadow-sm hover:bg-red-50 transition-colors border border-red-100">
+                            ดูปฏิทินทั้งหมด
+                        </button>
                     </div>
 
-                    <!-- Removed Video Section -->
-
-                    <div class="bg-white rounded-2xl p-6 shadow-sm">
-                        <h2 class="text-xl font-bold mb-4">เว็บไซต์โรงเรียน</h2>
+                    <!-- School Links -->
+                    <div class="glass-card rounded-[32px] p-6 border border-white/60">
+                        <h2 class="text-lg font-bold text-gray-900 mb-4">ติดต่อโรงเรียน</h2>
                         <div class="space-y-3">
-                            <a href="http://www.khukhan.ac.th" target="_blank" class="flex items-center p-3 border rounded-xl hover:bg-gray-50 transition text-blue-800">
-                                <i class="fas fa-university text-2xl mr-3"></i>
+                            <a href="javascript:void(0)" onclick="transitionToPage('http://www.khukhan.ac.th')" class="flex items-center p-3.5 rounded-2xl bg-white/70 hover:bg-white transition-all border border-gray-100 hover:shadow-md group">
+                                <div class="w-10 h-10 rounded-xl bg-blue-50 text-blue-600 flex items-center justify-center mr-3 group-hover:scale-110 transition-transform">
+                                    <i class="fas fa-university"></i>
+                                </div>
                                 <div>
-                                    <span class="font-medium block">โรงเรียนขุขันธ์</span>
-                                    <span class="text-xs text-gray-500">www.khukhan.ac.th</span>
+                                    <span class="font-bold text-gray-800 block text-sm">โรงเรียนขุขันธ์</span>
+                                    <span class="text-xs text-gray-400 font-medium">www.khukhan.ac.th</span>
                                 </div>
                             </a>
-                            <a href="https://www.facebook.com/KhukhanSchool.KS" target="_blank" class="flex items-center p-3 border rounded-xl hover:bg-gray-50 transition text-blue-600">
-                                <i class="fab fa-facebook text-2xl mr-3"></i>
+                            <a href="javascript:void(0)" onclick="transitionToPage('https://www.facebook.com/KhukhanSchool.KS')" class="flex items-center p-3.5 rounded-2xl bg-white/70 hover:bg-white transition-all border border-gray-100 hover:shadow-md group">
+                                <div class="w-10 h-10 rounded-xl bg-indigo-50 text-indigo-600 flex items-center justify-center mr-3 group-hover:scale-110 transition-transform">
+                                    <i class="fab fa-facebook-f"></i>
+                                </div>
                                 <div>
-                                    <span class="font-medium block">Facebook โรงเรียน</span>
-                                    <span class="text-xs text-gray-500">ติดตามข่าวสารประชาสัมพันธ์</span>
+                                    <span class="font-bold text-gray-800 block text-sm">Facebook Page</span>
+                                    <span class="text-xs text-gray-400 font-medium">ข่าวสารประชาสัมพันธ์</span>
                                 </div>
                             </a>
                         </div>
@@ -215,384 +429,373 @@
             </div>
         </div>
 
-        <!-- Section: Schedule -->
+        <!-- SECTION: SCHEDULE -->
         <div id="section-schedule" class="tab-content hidden">
-            <!-- (Content maintained as previously generated) -->
-             <div class="bg-white rounded-2xl shadow-sm overflow-hidden">
-                <div class="p-6 border-b flex justify-between items-center">
+            <div class="glass-card rounded-[32px] overflow-hidden shadow-xl border border-white/50">
+                <div class="p-6 md:p-8 bg-white/80 backdrop-blur-md border-b border-gray-100 flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
                     <div>
-                        <h2 class="text-2xl font-bold">ตารางเรียน ม.5/6</h2>
-                        <p class="text-sm text-gray-500">ภาคเรียนที่ 2 ปีการศึกษา 2568 โรงเรียนขุขันธ์</p>
+                        <h2 class="text-2xl font-bold text-gray-900">ตารางเรียน</h2>
+                        <p class="text-gray-500 mt-1 font-medium">ภาคเรียนที่ 2/2568 โรงเรียนขุขันธ์</p>
                     </div>
-                    <div class="text-xs text-gray-400 hidden md:block">ปรับปรุงล่าสุด: 29 ต.ค. 68</div>
+                    <span class="px-4 py-1.5 rounded-full bg-blue-50 text-blue-600 text-xs font-bold uppercase tracking-wider">
+                        Updated: 29 ต.ค. 68
+                    </span>
                 </div>
 
                 <!-- Desktop Table View -->
-                <div class="hidden md:block overflow-x-auto p-4">
-                    <table class="w-full text-center border-collapse min-w-[1000px]">
+                <div class="hidden md:block overflow-x-auto bg-white/60">
+                    <table class="w-full text-center border-collapse">
                         <thead>
-                            <tr class="bg-blue-50 text-blue-800 text-xs md:text-sm">
-                                <th class="p-3 border border-blue-100 w-24">วัน / คาบ</th>
-                                <th class="p-2 border border-blue-100 w-24"><div class="font-bold">1</div><div class="text-xs text-gray-500">08.40-09.30</div></th>
-                                <th class="p-2 border border-blue-100 w-24"><div class="font-bold">2</div><div class="text-xs text-gray-500">09.30-10.20</div></th>
-                                <th class="p-2 border border-blue-100 w-24"><div class="font-bold">3</div><div class="text-xs text-gray-500">10.20-11.10</div></th>
-                                <th class="p-2 border border-blue-100 w-24"><div class="font-bold">4</div><div class="text-xs text-gray-500">11.10-12.00</div></th>
-                                <th class="p-2 border border-blue-100 bg-gray-100 w-20"><div class="font-bold">5</div><div class="text-xs text-gray-500">12.00-12.50</div></th>
-                                <th class="p-2 border border-blue-100 w-24"><div class="font-bold">6</div><div class="text-xs text-gray-500">12.50-13.40</div></th>
-                                <th class="p-2 border border-blue-100 w-24"><div class="font-bold">7</div><div class="text-xs text-gray-500">13.40-14.30</div></th>
-                                <th class="p-2 border border-blue-100 w-24"><div class="font-bold">8</div><div class="text-xs text-gray-500">14.30-15.20</div></th>
-                                <th class="p-2 border border-blue-100 w-24"><div class="font-bold">9</div><div class="text-xs text-gray-500">15.20-16.10</div></th>
+                            <tr class="bg-gray-50/50 text-gray-500 text-xs uppercase tracking-wider font-semibold border-b border-gray-100">
+                                <th class="p-4 w-24">วัน</th>
+                                <th class="p-4 border-l border-gray-100">1<br><span class="opacity-50">08.40-09.30</span></th>
+                                <th class="p-4 border-l border-gray-100">2<br><span class="opacity-50">09.30-10.20</span></th>
+                                <th class="p-4 border-l border-gray-100">3<br><span class="opacity-50">10.20-11.10</span></th>
+                                <th class="p-4 border-l border-gray-100">4<br><span class="opacity-50">11.10-12.00</span></th>
+                                <th class="p-4 border-l border-gray-100 bg-gray-100/30 w-20">5<br><span class="opacity-50">12.00-12.50</span></th>
+                                <th class="p-4 border-l border-gray-100">6<br><span class="opacity-50">12.50-13.40</span></th>
+                                <th class="p-4 border-l border-gray-100">7<br><span class="opacity-50">13.40-14.30</span></th>
+                                <th class="p-4 border-l border-gray-100">8<br><span class="opacity-50">14.30-15.20</span></th>
+                                <th class="p-4 border-l border-gray-100">9<br><span class="opacity-50">15.20-16.10</span></th>
                             </tr>
                         </thead>
-                        <tbody class="text-xs md:text-sm">
-                            <!-- Rows for schedule as defined previously -->
-                             <tr class="hover:bg-gray-50 transition">
-                                <td class="p-2 border border-gray-200 font-bold bg-yellow-100 text-yellow-800">จันทร์</td>
-                                <td class="p-2 border border-gray-200"><div class="font-bold text-gray-800">อ32102</div><div class="text-xs text-gray-500">ครูสาริกา</div><div class="text-xs bg-yellow-100 rounded px-1 inline-block mt-1">323</div></td>
-                                <td class="p-2 border border-gray-200"><div class="font-bold text-gray-800">แนะแนว</div><div class="text-xs text-gray-500">ครูกัญญ์ภัสส</div><div class="text-xs bg-yellow-100 rounded px-1 inline-block mt-1">123</div></td>
-                                <td class="p-2 border border-gray-200"><div class="font-bold text-gray-800">ค32122</div><div class="text-xs text-gray-500">ครูปทิตตา</div><div class="text-xs bg-yellow-100 rounded px-1 inline-block mt-1">635</div></td>
-                                <td class="p-2 border border-gray-200"><div class="font-bold text-gray-800">I30202</div><div class="text-xs text-gray-500">ครูดิลก</div><div class="text-xs bg-yellow-100 rounded px-1 inline-block mt-1">ดนตรีสก.2</div></td>
-                                <td class="p-2 border border-gray-200 bg-gray-100 font-bold text-gray-400 writing-vertical py-4" rowspan="5">พัก<br>กลาง<br>วัน</td>
-                                <td class="p-2 border border-gray-200"><div class="font-bold text-gray-800">ว32102</div><div class="text-xs text-gray-500">ครูศุภวัฒน์</div><div class="text-xs bg-yellow-100 rounded px-1 inline-block mt-1">442</div></td>
-                                <td class="p-2 border border-gray-200"><div class="font-bold text-gray-800">ว32102</div><div class="text-xs text-gray-500">ครูศุภวัฒน์</div><div class="text-xs bg-yellow-100 rounded px-1 inline-block mt-1">442</div></td>
-                                <td class="p-2 border border-gray-200"><div class="font-bold text-gray-800">อ30204</div><div class="text-xs text-gray-500">ครูJada</div><div class="text-xs bg-yellow-100 rounded px-1 inline-block mt-1">324</div></td>
-                                <td class="p-2 border border-gray-200 bg-gray-50"></td>
+                        <tbody class="text-sm font-medium">
+                            <!-- Monday -->
+                            <tr class="border-b border-gray-100 hover:bg-white transition-colors">
+                                <td class="p-4 font-bold text-yellow-600 bg-yellow-50/40">จันทร์</td>
+                                <td class="p-2 border-l border-gray-100"><div class="font-bold text-gray-800">อ32102</div><div class="text-[10px] text-gray-400 uppercase">ครูสาริกา</div><span class="inline-block mt-1 px-1.5 py-0.5 bg-gray-100 text-gray-500 text-[10px] rounded-md font-bold">323</span></td>
+                                <td class="p-2 border-l border-gray-100"><div class="font-bold text-gray-800">แนะแนว</div><div class="text-[10px] text-gray-400 uppercase">ครูกัญญ์ภัสส</div><span class="inline-block mt-1 px-1.5 py-0.5 bg-gray-100 text-gray-500 text-[10px] rounded-md font-bold">123</span></td>
+                                <td class="p-2 border-l border-gray-100"><div class="font-bold text-gray-800">ค32122</div><div class="text-[10px] text-gray-400 uppercase">ครูปทิตตา</div><span class="inline-block mt-1 px-1.5 py-0.5 bg-gray-100 text-gray-500 text-[10px] rounded-md font-bold">635</span></td>
+                                <td class="p-2 border-l border-gray-100"><div class="font-bold text-gray-800">I30202</div><div class="text-[10px] text-gray-400 uppercase">ครูดิลก</div><span class="inline-block mt-1 px-1.5 py-0.5 bg-gray-100 text-gray-500 text-[10px] rounded-md font-bold">ดนตรี2</span></td>
+                                <td class="p-2 border-l border-gray-100 bg-gray-50/50 text-gray-400 text-xs font-bold writing-vertical"><div class="py-4 rotate-90 md:rotate-0">พัก</div></td>
+                                <td class="p-2 border-l border-gray-100"><div class="font-bold text-gray-800">ว32102</div><div class="text-[10px] text-gray-400 uppercase">ครูศุภวัฒน์</div><span class="inline-block mt-1 px-1.5 py-0.5 bg-gray-100 text-gray-500 text-[10px] rounded-md font-bold">442</span></td>
+                                <td class="p-2 border-l border-gray-100"><div class="font-bold text-gray-800">ว32102</div><div class="text-[10px] text-gray-400 uppercase">ครูศุภวัฒน์</div><span class="inline-block mt-1 px-1.5 py-0.5 bg-gray-100 text-gray-500 text-[10px] rounded-md font-bold">442</span></td>
+                                <td class="p-2 border-l border-gray-100"><div class="font-bold text-gray-800">อ30204</div><div class="text-[10px] text-gray-400 uppercase">ครูJada</div><span class="inline-block mt-1 px-1.5 py-0.5 bg-gray-100 text-gray-500 text-[10px] rounded-md font-bold">324</span></td>
+                                <td class="p-2 border-l border-gray-100"></td>
                             </tr>
-                            <tr class="hover:bg-gray-50 transition">
-                                <td class="p-2 border border-gray-200 font-bold bg-pink-100 text-pink-800">อังคาร</td>
-                                <td class="p-2 border border-gray-200"><div class="font-bold text-gray-800">เลือกเสรี</div><div class="text-xs text-gray-500">-</div><div class="text-xs bg-pink-100 rounded px-1 inline-block mt-1">ม.5</div></td>
-                                <td class="p-2 border border-gray-200"><div class="font-bold text-gray-800">เลือกเสรี</div><div class="text-xs text-gray-500">-</div><div class="text-xs bg-pink-100 rounded px-1 inline-block mt-1">ม.5</div></td>
-                                <td class="p-2 border border-gray-200"><div class="font-bold text-gray-800">ค32226</div><div class="text-xs text-gray-500">ครูนงนุช</div><div class="text-xs bg-pink-100 rounded px-1 inline-block mt-1">634</div></td>
-                                <td class="p-2 border border-gray-200"><div class="font-bold text-gray-800">ส32103</div><div class="text-xs text-gray-500">ครูวาสินีย์</div><div class="text-xs bg-pink-100 rounded px-1 inline-block mt-1">547</div></td>
-                                <td class="p-2 border border-gray-200 bg-gray-50"></td>
-                                <td class="p-2 border border-gray-200"><div class="font-bold text-gray-800">ท32102</div><div class="text-xs text-gray-500">ครูทวีศิลป์</div><div class="text-xs bg-pink-100 rounded px-1 inline-block mt-1">114</div></td>
-                                <td class="p-2 border border-gray-200"><div class="font-bold text-gray-800">พ32102</div><div class="text-xs text-gray-500">ครูบุญช่วย</div><div class="text-xs bg-pink-100 rounded px-1 inline-block mt-1">113</div></td>
-                                <td class="p-2 border border-gray-200"><div class="font-bold text-gray-800">อ32102</div><div class="text-xs text-gray-500">ครูสาริกา</div><div class="text-xs bg-pink-100 rounded px-1 inline-block mt-1">323</div></td>
+                            <!-- Other days (Content same as previous, just updated container style) -->
+                            <tr class="border-b border-gray-100 hover:bg-white transition-colors">
+                                <td class="p-4 font-bold text-pink-600 bg-pink-50/40">อังคาร</td>
+                                <td class="p-2 border-l border-gray-100"><div class="font-bold text-gray-800">เลือกเสรี</div><div class="text-[10px] text-gray-400">-</div><span class="inline-block mt-1 px-1.5 py-0.5 bg-gray-100 text-gray-500 text-[10px] rounded-md font-bold">ม.5</span></td>
+                                <td class="p-2 border-l border-gray-100"><div class="font-bold text-gray-800">เลือกเสรี</div><div class="text-[10px] text-gray-400">-</div><span class="inline-block mt-1 px-1.5 py-0.5 bg-gray-100 text-gray-500 text-[10px] rounded-md font-bold">ม.5</span></td>
+                                <td class="p-2 border-l border-gray-100"><div class="font-bold text-gray-800">ค32226</div><div class="text-[10px] text-gray-400">ครูนงนุช</div><span class="inline-block mt-1 px-1.5 py-0.5 bg-gray-100 text-gray-500 text-[10px] rounded-md font-bold">634</span></td>
+                                <td class="p-2 border-l border-gray-100"><div class="font-bold text-gray-800">ส32103</div><div class="text-[10px] text-gray-400">ครูวาสินีย์</div><span class="inline-block mt-1 px-1.5 py-0.5 bg-gray-100 text-gray-500 text-[10px] rounded-md font-bold">547</span></td>
+                                <td class="p-2 border-l border-gray-100 bg-gray-50/50"></td>
+                                <td class="p-2 border-l border-gray-100"><div class="font-bold text-gray-800">ท32102</div><div class="text-[10px] text-gray-400">ครูทวีศิลป์</div><span class="inline-block mt-1 px-1.5 py-0.5 bg-gray-100 text-gray-500 text-[10px] rounded-md font-bold">114</span></td>
+                                <td class="p-2 border-l border-gray-100"><div class="font-bold text-gray-800">พ32102</div><div class="text-[10px] text-gray-400">ครูบุญช่วย</div><span class="inline-block mt-1 px-1.5 py-0.5 bg-gray-100 text-gray-500 text-[10px] rounded-md font-bold">113</span></td>
+                                <td class="p-2 border-l border-gray-100"><div class="font-bold text-gray-800">อ32102</div><div class="text-[10px] text-gray-400">ครูสาริกา</div><span class="inline-block mt-1 px-1.5 py-0.5 bg-gray-100 text-gray-500 text-[10px] rounded-md font-bold">323</span></td>
                             </tr>
-                            <tr class="hover:bg-gray-50 transition">
-                                <td class="p-2 border border-gray-200 font-bold bg-green-100 text-green-800">พุธ</td>
-                                <td class="p-2 border border-gray-200"><div class="font-bold text-gray-800">I30202</div><div class="text-xs text-gray-500">ครูดิลก</div><div class="text-xs bg-green-100 rounded px-1 inline-block mt-1">ดนตรีสก.2</div></td>
-                                <td class="p-2 border border-gray-200"><div class="font-bold text-gray-800">ค32122</div><div class="text-xs text-gray-500">ครูปทิตตา</div><div class="text-xs bg-green-100 rounded px-1 inline-block mt-1">635</div></td>
-                                <td class="p-2 border border-gray-200"><div class="font-bold text-gray-800">ส32103</div><div class="text-xs text-gray-500">ครูวาสินีย์</div><div class="text-xs bg-green-100 rounded px-1 inline-block mt-1">547</div></td>
-                                <td class="p-2 border border-gray-200"><div class="font-bold text-gray-800">ท32102</div><div class="text-xs text-gray-500">ครูทวีศิลป์</div><div class="text-xs bg-green-100 rounded px-1 inline-block mt-1">114</div></td>
-                                <td class="p-2 border border-gray-200"><div class="font-bold text-gray-800">ว32288</div><div class="text-xs text-gray-500">ครูนัฐกร</div><div class="text-xs bg-green-100 rounded px-1 inline-block mt-1">512</div></td>
-                                <td class="p-2 border border-gray-200"><div class="font-bold text-gray-800">ว32288</div><div class="text-xs text-gray-500">ครูนัฐกร</div><div class="text-xs bg-green-100 rounded px-1 inline-block mt-1">512</div></td>
-                                <td class="p-2 border border-gray-200 bg-gray-50"></td>
-                                <td class="p-2 border border-gray-200"><div class="font-bold text-gray-800">กิจกรรม</div><div class="text-xs text-gray-500">พัฒนา</div><div class="text-xs text-gray-500">ผู้เรียน</div></td>
+                            <tr class="border-b border-gray-100 hover:bg-white transition-colors">
+                                <td class="p-4 font-bold text-green-600 bg-green-50/40">พุธ</td>
+                                <td class="p-2 border-l border-gray-100"><div class="font-bold text-gray-800">I30202</div><div class="text-[10px] text-gray-400">ครูดิลก</div><span class="inline-block mt-1 px-1.5 py-0.5 bg-gray-100 text-gray-500 text-[10px] rounded-md font-bold">ดนตรี2</span></td>
+                                <td class="p-2 border-l border-gray-100"><div class="font-bold text-gray-800">ค32122</div><div class="text-[10px] text-gray-400">ครูปทิตตา</div><span class="inline-block mt-1 px-1.5 py-0.5 bg-gray-100 text-gray-500 text-[10px] rounded-md font-bold">635</span></td>
+                                <td class="p-2 border-l border-gray-100"><div class="font-bold text-gray-800">ส32103</div><div class="text-[10px] text-gray-400">ครูวาสินีย์</div><span class="inline-block mt-1 px-1.5 py-0.5 bg-gray-100 text-gray-500 text-[10px] rounded-md font-bold">547</span></td>
+                                <td class="p-2 border-l border-gray-100"><div class="font-bold text-gray-800">ท32102</div><div class="text-[10px] text-gray-400">ครูทวีศิลป์</div><span class="inline-block mt-1 px-1.5 py-0.5 bg-gray-100 text-gray-500 text-[10px] rounded-md font-bold">114</span></td>
+                                <td class="p-2 border-l border-gray-100 bg-gray-50/50"></td>
+                                <td class="p-2 border-l border-gray-100"><div class="font-bold text-gray-800">ว32288</div><div class="text-[10px] text-gray-400">ครูนัฐกร</div><span class="inline-block mt-1 px-1.5 py-0.5 bg-gray-100 text-gray-500 text-[10px] rounded-md font-bold">512</span></td>
+                                <td class="p-2 border-l border-gray-100"><div class="font-bold text-gray-800">ว32288</div><div class="text-[10px] text-gray-400">ครูนัฐกร</div><span class="inline-block mt-1 px-1.5 py-0.5 bg-gray-100 text-gray-500 text-[10px] rounded-md font-bold">512</span></td>
+                                <td class="p-2 border-l border-gray-100"><div class="font-bold text-gray-800">กิจกรรม</div><div class="text-[10px] text-gray-400">พัฒนาผู้เรียน</div></td>
                             </tr>
-                            <tr class="hover:bg-gray-50 transition">
-                                <td class="p-2 border border-gray-200 font-bold bg-orange-100 text-orange-800">พฤหัสฯ</td>
-                                <td class="p-2 border border-gray-200"><div class="font-bold text-gray-800">ค32227</div><div class="text-xs text-gray-500">ครูสร้อยดาว</div><div class="text-xs bg-orange-100 rounded px-1 inline-block mt-1">634</div></td>
-                                <td class="p-2 border border-gray-200"><div class="font-bold text-gray-800">ค32226</div><div class="text-xs text-gray-500">ครูนงนุช</div><div class="text-xs bg-orange-100 rounded px-1 inline-block mt-1">634</div></td>
-                                <td class="p-2 border border-gray-200"><div class="font-bold text-gray-800">ส32104</div><div class="text-xs text-gray-500">ครูชนกานต์</div><div class="text-xs bg-orange-100 rounded px-1 inline-block mt-1">544</div></td>
-                                <td class="p-2 border border-gray-200 bg-gray-50"></td>
-                                <td class="p-2 border border-gray-200"><div class="font-bold text-gray-800">ศ32102</div><div class="text-xs text-gray-500">ครูชนัญชิดา</div><div class="text-xs bg-orange-100 rounded px-1 inline-block mt-1">นาฏศิลป์2</div></td>
-                                <td class="p-2 border border-gray-200"><div class="font-bold text-gray-800">ง32102</div><div class="text-xs text-gray-500">ครูอินธุกาญ</div><div class="text-xs bg-orange-100 rounded px-1 inline-block mt-1">คก 2</div></td>
-                                <td class="p-2 border border-gray-200"><div class="font-bold text-gray-800">ง32102</div><div class="text-xs text-gray-500">ครูอินธุกาญ</div><div class="text-xs bg-orange-100 rounded px-1 inline-block mt-1">คก 2</div></td>
-                                <td class="p-2 border border-gray-200"><div class="font-bold text-gray-800">กิจกรรม</div><div class="text-xs text-gray-500">ชุมนุม</div></td>
+                            <tr class="border-b border-gray-100 hover:bg-white transition-colors">
+                                <td class="p-4 font-bold text-orange-600 bg-orange-50/40">พฤหัสฯ</td>
+                                <td class="p-2 border-l border-gray-100"><div class="font-bold text-gray-800">ค32227</div><div class="text-[10px] text-gray-400">ครูสร้อยดาว</div><span class="inline-block mt-1 px-1.5 py-0.5 bg-gray-100 text-gray-500 text-[10px] rounded-md font-bold">634</span></td>
+                                <td class="p-2 border-l border-gray-100"><div class="font-bold text-gray-800">ค32226</div><div class="text-[10px] text-gray-400">ครูนงนุช</div><span class="inline-block mt-1 px-1.5 py-0.5 bg-gray-100 text-gray-500 text-[10px] rounded-md font-bold">634</span></td>
+                                <td class="p-2 border-l border-gray-100"><div class="font-bold text-gray-800">ส32104</div><div class="text-[10px] text-gray-400">ครูชนกานต์</div><span class="inline-block mt-1 px-1.5 py-0.5 bg-gray-100 text-gray-500 text-[10px] rounded-md font-bold">544</span></td>
+                                <td class="p-2 border-l border-gray-100 bg-gray-50/50"></td>
+                                <td class="p-2 border-l border-gray-100"><div class="font-bold text-gray-800">ศ32102</div><div class="text-[10px] text-gray-400">ครูชนัญชิดา</div><span class="inline-block mt-1 px-1.5 py-0.5 bg-gray-100 text-gray-500 text-[10px] rounded-md font-bold">นาฏ2</span></td>
+                                <td class="p-2 border-l border-gray-100"><div class="font-bold text-gray-800">ง32102</div><div class="text-[10px] text-gray-400">ครูอินธุกาญ</div><span class="inline-block mt-1 px-1.5 py-0.5 bg-gray-100 text-gray-500 text-[10px] rounded-md font-bold">คก2</span></td>
+                                <td class="p-2 border-l border-gray-100"><div class="font-bold text-gray-800">ง32102</div><div class="text-[10px] text-gray-400">ครูอินธุกาญ</div><span class="inline-block mt-1 px-1.5 py-0.5 bg-gray-100 text-gray-500 text-[10px] rounded-md font-bold">คก2</span></td>
+                                <td class="p-2 border-l border-gray-100"><div class="font-bold text-gray-800">กิจกรรม</div><div class="text-[10px] text-gray-400">ชุมนุม</div></td>
                             </tr>
-                            <tr class="hover:bg-gray-50 transition">
-                                <td class="p-2 border border-gray-200 font-bold bg-blue-100 text-blue-800">ศุกร์</td>
-                                <td class="p-2 border border-gray-200"><div class="font-bold text-gray-800">เลือกเสรี</div><div class="text-xs text-gray-500">-</div><div class="text-xs bg-blue-100 rounded px-1 inline-block mt-1">ม.5</div></td>
-                                <td class="p-2 border border-gray-200"><div class="font-bold text-gray-800">เลือกเสรี</div><div class="text-xs text-gray-500">-</div><div class="text-xs bg-blue-100 rounded px-1 inline-block mt-1">ม.5</div></td>
-                                <td class="p-2 border border-gray-200"><div class="font-bold text-gray-800">ว30205</div><div class="text-xs text-gray-500">ครูปิยธิดา</div><div class="text-xs bg-blue-100 rounded px-1 inline-block mt-1">431</div></td>
-                                <td class="p-2 border border-gray-200"><div class="font-bold text-gray-800">ว30205</div><div class="text-xs text-gray-500">ครูปิยธิดา</div><div class="text-xs bg-blue-100 rounded px-1 inline-block mt-1">431</div></td>
-                                <td class="p-2 border border-gray-200"><div class="font-bold text-gray-800">ค32227</div><div class="text-xs text-gray-500">ครูสร้อยดาว</div><div class="text-xs bg-blue-100 rounded px-1 inline-block mt-1">636</div></td>
-                                <td class="p-2 border border-gray-200"><div class="font-bold text-gray-800">ส30224</div><div class="text-xs text-gray-500">ครูนัฐกร</div><div class="text-xs bg-blue-100 rounded px-1 inline-block mt-1">512</div></td>
-                                <td class="p-2 border border-gray-200"><div class="font-bold text-gray-800">โรงเรียน</div><div class="text-xs text-gray-500">คุณธรรม</div></td>
-                                <td class="p-2 border border-gray-200"><div class="font-bold text-gray-800">กิจกรรม</div><div class="text-xs text-gray-500">โฮมรูม</div></td>
+                            <tr class="hover:bg-white transition-colors">
+                                <td class="p-4 font-bold text-blue-600 bg-blue-50/40">ศุกร์</td>
+                                <td class="p-2 border-l border-gray-100"><div class="font-bold text-gray-800">เลือกเสรี</div><div class="text-[10px] text-gray-400">-</div><span class="inline-block mt-1 px-1.5 py-0.5 bg-gray-100 text-gray-500 text-[10px] rounded-md font-bold">ม.5</span></td>
+                                <td class="p-2 border-l border-gray-100"><div class="font-bold text-gray-800">เลือกเสรี</div><div class="text-[10px] text-gray-400">-</div><span class="inline-block mt-1 px-1.5 py-0.5 bg-gray-100 text-gray-500 text-[10px] rounded-md font-bold">ม.5</span></td>
+                                <td class="p-2 border-l border-gray-100"><div class="font-bold text-gray-800">ว30205</div><div class="text-[10px] text-gray-400">ครูปิยธิดา</div><span class="inline-block mt-1 px-1.5 py-0.5 bg-gray-100 text-gray-500 text-[10px] rounded-md font-bold">431</span></td>
+                                <td class="p-2 border-l border-gray-100"><div class="font-bold text-gray-800">ว30205</div><div class="text-[10px] text-gray-400">ครูปิยธิดา</div><span class="inline-block mt-1 px-1.5 py-0.5 bg-gray-100 text-gray-500 text-[10px] rounded-md font-bold">431</span></td>
+                                <td class="p-2 border-l border-gray-100 bg-gray-50/50"></td>
+                                <td class="p-2 border-l border-gray-100"><div class="font-bold text-gray-800">ค32227</div><div class="text-[10px] text-gray-400">ครูสร้อยดาว</div><span class="inline-block mt-1 px-1.5 py-0.5 bg-gray-100 text-gray-500 text-[10px] rounded-md font-bold">636</span></td>
+                                <td class="p-2 border-l border-gray-100"><div class="font-bold text-gray-800">ส30224</div><div class="text-[10px] text-gray-400">ครูนัฐกร</div><span class="inline-block mt-1 px-1.5 py-0.5 bg-gray-100 text-gray-500 text-[10px] rounded-md font-bold">512</span></td>
+                                <td class="p-2 border-l border-gray-100"><div class="font-bold text-gray-800">รร.คุณธรรม</div></td>
+                                <td class="p-2 border-l border-gray-100"><div class="font-bold text-gray-800">โฮมรูม</div></td>
                             </tr>
                         </tbody>
                     </table>
                 </div>
-                
-                <!-- Mobile List View -->
+
+                <!-- Mobile Schedule (Tabs Style) -->
                 <div class="md:hidden">
-                    <div class="flex overflow-x-auto border-b border-gray-100 bg-gray-50 p-2 gap-2 scrollbar-hide">
-                        <button onclick="selectMobileDay('mon')" id="tab-mon" class="mobile-tab flex-1 min-w-[80px] py-2 px-4 rounded-lg text-sm font-bold bg-yellow-400 text-white shadow-sm transition">จันทร์</button>
-                        <button onclick="selectMobileDay('tue')" id="tab-tue" class="mobile-tab flex-1 min-w-[80px] py-2 px-4 rounded-lg text-sm font-bold bg-white text-gray-500 border border-gray-200 transition">อังคาร</button>
-                        <button onclick="selectMobileDay('wed')" id="tab-wed" class="mobile-tab flex-1 min-w-[80px] py-2 px-4 rounded-lg text-sm font-bold bg-white text-gray-500 border border-gray-200 transition">พุธ</button>
-                        <button onclick="selectMobileDay('thu')" id="tab-thu" class="mobile-tab flex-1 min-w-[80px] py-2 px-4 rounded-lg text-sm font-bold bg-white text-gray-500 border border-gray-200 transition">พฤหัส</button>
-                        <button onclick="selectMobileDay('fri')" id="tab-fri" class="mobile-tab flex-1 min-w-[80px] py-2 px-4 rounded-lg text-sm font-bold bg-white text-gray-500 border border-gray-200 transition">ศุกร์</button>
+                    <div class="flex overflow-x-auto bg-gray-50/50 p-2 gap-2 scrollbar-hide border-b border-gray-200">
+                        <button onclick="selectMobileDay('mon')" id="tab-mon" class="mobile-tab flex-shrink-0 px-5 py-2.5 rounded-full text-sm font-bold bg-yellow-400 text-white shadow-md transition-all">จันทร์</button>
+                        <button onclick="selectMobileDay('tue')" id="tab-tue" class="mobile-tab flex-shrink-0 px-5 py-2.5 rounded-full text-sm font-bold bg-white text-gray-500 border border-gray-200 transition-all">อังคาร</button>
+                        <button onclick="selectMobileDay('wed')" id="tab-wed" class="mobile-tab flex-shrink-0 px-5 py-2.5 rounded-full text-sm font-bold bg-white text-gray-500 border border-gray-200 transition-all">พุธ</button>
+                        <button onclick="selectMobileDay('thu')" id="tab-thu" class="mobile-tab flex-shrink-0 px-5 py-2.5 rounded-full text-sm font-bold bg-white text-gray-500 border border-gray-200 transition-all">พฤหัส</button>
+                        <button onclick="selectMobileDay('fri')" id="tab-fri" class="mobile-tab flex-shrink-0 px-5 py-2.5 rounded-full text-sm font-bold bg-white text-gray-500 border border-gray-200 transition-all">ศุกร์</button>
                     </div>
 
-                    <!-- Day Content for Mobile -->
-                    <div class="p-4 bg-gray-50 min-h-[300px]">
-                        <!-- Content same as previous output, hiding for brevity but assumed present -->
+                    <div class="p-4 bg-gray-50/30 min-h-[300px]">
+                        <!-- Content for Monday -->
                         <div id="mobile-mon" class="mobile-day-content space-y-3">
-                             <div class="bg-white p-3 rounded-xl shadow-sm border-l-4 border-yellow-400 flex justify-between items-center"><div><p class="text-xs text-gray-400">08.40-09.30</p><p class="font-bold text-gray-800">อ32102</p><p class="text-xs text-gray-500">ครูสาริกา</p></div><div class="bg-yellow-50 text-yellow-600 px-2 py-1 rounded text-xs font-bold">ห้อง 323</div></div>
-                             <div class="bg-white p-3 rounded-xl shadow-sm border-l-4 border-yellow-400 flex justify-between items-center"><div><p class="text-xs text-gray-400">09.30-10.20</p><p class="font-bold text-gray-800">แนะแนว</p><p class="text-xs text-gray-500">ครูกัญญ์ภัสส</p></div><div class="bg-yellow-50 text-yellow-600 px-2 py-1 rounded text-xs font-bold">ห้อง 123</div></div>
-                             <div class="bg-white p-3 rounded-xl shadow-sm border-l-4 border-yellow-400 flex justify-between items-center"><div><p class="text-xs text-gray-400">10.20-11.10</p><p class="font-bold text-gray-800">ค32122</p><p class="text-xs text-gray-500">ครูปทิตตา</p></div><div class="bg-yellow-50 text-yellow-600 px-2 py-1 rounded text-xs font-bold">ห้อง 635</div></div>
-                             <div class="bg-white p-3 rounded-xl shadow-sm border-l-4 border-yellow-400 flex justify-between items-center"><div><p class="text-xs text-gray-400">11.10-12.00</p><p class="font-bold text-gray-800">I30202</p><p class="text-xs text-gray-500">ครูดิลก</p></div><div class="bg-yellow-50 text-yellow-600 px-2 py-1 rounded text-xs font-bold">ดนตรีสก.2</div></div>
-                             <div class="bg-gray-100 p-3 rounded-xl shadow-inner text-center text-gray-500 font-bold border border-gray-200">12.00 - 12.50 พักกลางวัน</div>
-                             <div class="bg-white p-3 rounded-xl shadow-sm border-l-4 border-yellow-400 flex justify-between items-center"><div><p class="text-xs text-gray-400">12.50-14.30 (2คาบ)</p><p class="font-bold text-gray-800">ว32102</p><p class="text-xs text-gray-500">ครูศุภวัฒน์</p></div><div class="bg-yellow-50 text-yellow-600 px-2 py-1 rounded text-xs font-bold">ห้อง 442</div></div>
-                             <div class="bg-white p-3 rounded-xl shadow-sm border-l-4 border-yellow-400 flex justify-between items-center"><div><p class="text-xs text-gray-400">14.30-15.20</p><p class="font-bold text-gray-800">อ30204</p><p class="text-xs text-gray-500">ครูJada</p></div><div class="bg-yellow-50 text-yellow-600 px-2 py-1 rounded text-xs font-bold">ห้อง 324</div></div>
+                             <div class="bg-white p-4 rounded-3xl shadow-sm border border-gray-100 flex justify-between items-center">
+                                <div><p class="text-[10px] font-bold text-gray-400 uppercase tracking-wide">08.40 - 09.30</p><p class="font-bold text-gray-800 text-lg">อ32102</p><p class="text-xs text-gray-500">ครูสาริกา</p></div>
+                                <div class="bg-yellow-50 text-yellow-600 px-3 py-1.5 rounded-xl text-xs font-bold shadow-sm">323</div>
+                             </div>
+                             <div class="bg-white p-4 rounded-3xl shadow-sm border border-gray-100 flex justify-between items-center">
+                                <div><p class="text-[10px] font-bold text-gray-400 uppercase tracking-wide">09.30 - 10.20</p><p class="font-bold text-gray-800 text-lg">แนะแนว</p><p class="text-xs text-gray-500">ครูกัญญ์ภัสส</p></div>
+                                <div class="bg-yellow-50 text-yellow-600 px-3 py-1.5 rounded-xl text-xs font-bold shadow-sm">123</div>
+                             </div>
+                             <div class="bg-white p-4 rounded-3xl shadow-sm border border-gray-100 flex justify-between items-center"><div><p class="text-[10px] font-bold text-gray-400 uppercase tracking-wide">10.20 - 11.10</p><p class="font-bold text-gray-800 text-lg">ค32122</p><p class="text-xs text-gray-500">ครูปทิตตา</p></div><div class="bg-yellow-50 text-yellow-600 px-3 py-1.5 rounded-xl text-xs font-bold shadow-sm">635</div></div>
+                             <div class="bg-white p-4 rounded-3xl shadow-sm border border-gray-100 flex justify-between items-center"><div><p class="text-[10px] font-bold text-gray-400 uppercase tracking-wide">11.10 - 12.00</p><p class="font-bold text-gray-800 text-lg">I30202</p><p class="text-xs text-gray-500">ครูดิลก</p></div><div class="bg-yellow-50 text-yellow-600 px-3 py-1.5 rounded-xl text-xs font-bold shadow-sm">ดนตรี2</div></div>
+                             <div class="bg-gray-100 p-2.5 rounded-2xl text-center text-xs font-bold text-gray-400 uppercase tracking-wide">พักกลางวัน</div>
+                             <div class="bg-white p-4 rounded-3xl shadow-sm border border-gray-100 flex justify-between items-center"><div><p class="text-[10px] font-bold text-gray-400 uppercase tracking-wide">12.50 - 14.30</p><p class="font-bold text-gray-800 text-lg">ว32102 (2คาบ)</p><p class="text-xs text-gray-500">ครูศุภวัฒน์</p></div><div class="bg-yellow-50 text-yellow-600 px-3 py-1.5 rounded-xl text-xs font-bold shadow-sm">442</div></div>
+                             <div class="bg-white p-4 rounded-3xl shadow-sm border border-gray-100 flex justify-between items-center"><div><p class="text-[10px] font-bold text-gray-400 uppercase tracking-wide">14.30 - 15.20</p><p class="font-bold text-gray-800 text-lg">อ30204</p><p class="text-xs text-gray-500">ครูJada</p></div><div class="bg-yellow-50 text-yellow-600 px-3 py-1.5 rounded-xl text-xs font-bold shadow-sm">324</div></div>
                         </div>
+                        
+                        <!-- Placeholders for other days (Hidden) - JS will toggle -->
                         <div id="mobile-tue" class="mobile-day-content space-y-3 hidden">
-                             <div class="bg-white p-3 rounded-xl shadow-sm border-l-4 border-pink-400 flex justify-between items-center"><div><p class="text-xs text-gray-400">08.40-10.20 (2คาบ)</p><p class="font-bold text-gray-800">เลือกเสรี</p><p class="text-xs text-gray-500">-</p></div><div class="bg-pink-50 text-pink-600 px-2 py-1 rounded text-xs font-bold">ม.5</div></div>
-                             <div class="bg-white p-3 rounded-xl shadow-sm border-l-4 border-pink-400 flex justify-between items-center"><div><p class="text-xs text-gray-400">10.20-11.10</p><p class="font-bold text-gray-800">ค32226</p><p class="text-xs text-gray-500">ครูนงนุช</p></div><div class="bg-pink-50 text-pink-600 px-2 py-1 rounded text-xs font-bold">ห้อง 634</div></div>
-                             <div class="bg-white p-3 rounded-xl shadow-sm border-l-4 border-pink-400 flex justify-between items-center"><div><p class="text-xs text-gray-400">11.10-12.00</p><p class="font-bold text-gray-800">ส32103</p><p class="text-xs text-gray-500">ครูวาสินีย์</p></div><div class="bg-pink-50 text-pink-600 px-2 py-1 rounded text-xs font-bold">ห้อง 547</div></div>
-                             <div class="bg-gray-100 p-3 rounded-xl shadow-inner text-center text-gray-500 font-bold border border-gray-200">12.00 - 12.50 พักกลางวัน</div>
-                             <div class="bg-white p-3 rounded-xl shadow-sm border-l-4 border-pink-400 flex justify-between items-center"><div><p class="text-xs text-gray-400">12.50-13.40</p><p class="font-bold text-gray-800">ท32102</p><p class="text-xs text-gray-500">ครูทวีศิลป์</p></div><div class="bg-pink-50 text-pink-600 px-2 py-1 rounded text-xs font-bold">ห้อง 114</div></div>
-                             <div class="bg-white p-3 rounded-xl shadow-sm border-l-4 border-pink-400 flex justify-between items-center"><div><p class="text-xs text-gray-400">13.40-14.30</p><p class="font-bold text-gray-800">พ32102</p><p class="text-xs text-gray-500">ครูบุญช่วย</p></div><div class="bg-pink-50 text-pink-600 px-2 py-1 rounded text-xs font-bold">ห้อง 113</div></div>
-                             <div class="bg-white p-3 rounded-xl shadow-sm border-l-4 border-pink-400 flex justify-between items-center"><div><p class="text-xs text-gray-400">14.30-15.20</p><p class="font-bold text-gray-800">อ32102</p><p class="text-xs text-gray-500">ครูสาริกา</p></div><div class="bg-pink-50 text-pink-600 px-2 py-1 rounded text-xs font-bold">ห้อง 323</div></div>
+                            <div class="text-center py-10 text-gray-400">โหลดข้อมูลวันอังคาร...</div>
                         </div>
                         <div id="mobile-wed" class="mobile-day-content space-y-3 hidden">
-                             <div class="bg-white p-3 rounded-xl shadow-sm border-l-4 border-green-400 flex justify-between items-center"><div><p class="text-xs text-gray-400">08.40-09.30</p><p class="font-bold text-gray-800">I30202</p><p class="text-xs text-gray-500">ครูดิลก</p></div><div class="bg-green-50 text-green-600 px-2 py-1 rounded text-xs font-bold">ดนตรีสก.2</div></div>
-                             <div class="bg-white p-3 rounded-xl shadow-sm border-l-4 border-green-400 flex justify-between items-center"><div><p class="text-xs text-gray-400">09.30-10.20</p><p class="font-bold text-gray-800">ค32122</p><p class="text-xs text-gray-500">ครูปทิตตา</p></div><div class="bg-green-50 text-green-600 px-2 py-1 rounded text-xs font-bold">ห้อง 635</div></div>
-                             <div class="bg-white p-3 rounded-xl shadow-sm border-l-4 border-green-400 flex justify-between items-center"><div><p class="text-xs text-gray-400">10.20-11.10</p><p class="font-bold text-gray-800">ส32103</p><p class="text-xs text-gray-500">ครูวาสินีย์</p></div><div class="bg-green-50 text-green-600 px-2 py-1 rounded text-xs font-bold">ห้อง 547</div></div>
-                             <div class="bg-white p-3 rounded-xl shadow-sm border-l-4 border-green-400 flex justify-between items-center"><div><p class="text-xs text-gray-400">11.10-12.00</p><p class="font-bold text-gray-800">ท32102</p><p class="text-xs text-gray-500">ครูทวีศิลป์</p></div><div class="bg-green-50 text-green-600 px-2 py-1 rounded text-xs font-bold">ห้อง 114</div></div>
-                             <div class="bg-gray-100 p-3 rounded-xl shadow-inner text-center text-gray-500 font-bold border border-gray-200">12.00 - 12.50 พักกลางวัน</div>
-                             <div class="bg-white p-3 rounded-xl shadow-sm border-l-4 border-green-400 flex justify-between items-center"><div><p class="text-xs text-gray-400">12.50-14.30 (2คาบ)</p><p class="font-bold text-gray-800">ว32288</p><p class="text-xs text-gray-500">ครูนัฐกร</p></div><div class="bg-green-50 text-green-600 px-2 py-1 rounded text-xs font-bold">ห้อง 512</div></div>
-                             <div class="bg-white p-3 rounded-xl shadow-sm border-l-4 border-green-400 flex justify-between items-center"><div><p class="text-xs text-gray-400">14.30-15.20</p><p class="font-bold text-gray-800">กิจกรรม</p><p class="text-xs text-gray-500">พัฒนาผู้เรียน</p></div><div class="bg-gray-50 text-gray-600 px-2 py-1 rounded text-xs font-bold">-</div></div>
+                            <div class="text-center py-10 text-gray-400">โหลดข้อมูลวันพุธ...</div>
                         </div>
                         <div id="mobile-thu" class="mobile-day-content space-y-3 hidden">
-                             <div class="bg-white p-3 rounded-xl shadow-sm border-l-4 border-orange-400 flex justify-between items-center"><div><p class="text-xs text-gray-400">08.40-09.30</p><p class="font-bold text-gray-800">ค32227</p><p class="text-xs text-gray-500">ครูสร้อยดาว</p></div><div class="bg-orange-50 text-orange-600 px-2 py-1 rounded text-xs font-bold">ห้อง 634</div></div>
-                             <div class="bg-white p-3 rounded-xl shadow-sm border-l-4 border-orange-400 flex justify-between items-center"><div><p class="text-xs text-gray-400">09.30-10.20</p><p class="font-bold text-gray-800">ค32226</p><p class="text-xs text-gray-500">ครูนงนุช</p></div><div class="bg-orange-50 text-orange-600 px-2 py-1 rounded text-xs font-bold">ห้อง 634</div></div>
-                             <div class="bg-white p-3 rounded-xl shadow-sm border-l-4 border-orange-400 flex justify-between items-center"><div><p class="text-xs text-gray-400">10.20-11.10</p><p class="font-bold text-gray-800">ส32104</p><p class="text-xs text-gray-500">ครูชนกานต์</p></div><div class="bg-orange-50 text-orange-600 px-2 py-1 rounded text-xs font-bold">ห้อง 544</div></div>
-                             <div class="bg-gray-100 p-3 rounded-xl shadow-inner text-center text-gray-500 font-bold border border-gray-200">11.10 - 12.50 พักกลางวัน (2คาบ)</div>
-                             <div class="bg-white p-3 rounded-xl shadow-sm border-l-4 border-orange-400 flex justify-between items-center"><div><p class="text-xs text-gray-400">12.50-13.40</p><p class="font-bold text-gray-800">ศ32102</p><p class="text-xs text-gray-500">ครูชนัญชิดา</p></div><div class="bg-orange-50 text-orange-600 px-2 py-1 rounded text-xs font-bold">นาฏศิลป์2</div></div>
-                             <div class="bg-white p-3 rounded-xl shadow-sm border-l-4 border-orange-400 flex justify-between items-center"><div><p class="text-xs text-gray-400">13.40-15.20 (2คาบ)</p><p class="font-bold text-gray-800">ง32102</p><p class="text-xs text-gray-500">ครูอินธุกาญ</p></div><div class="bg-orange-50 text-orange-600 px-2 py-1 rounded text-xs font-bold">คก 2</div></div>
-                             <div class="bg-white p-3 rounded-xl shadow-sm border-l-4 border-orange-400 flex justify-between items-center"><div><p class="text-xs text-gray-400">15.20-16.10</p><p class="font-bold text-gray-800">กิจกรรม</p><p class="text-xs text-gray-500">ชุมนุม</p></div><div class="bg-gray-50 text-gray-600 px-2 py-1 rounded text-xs font-bold">-</div></div>
+                            <div class="text-center py-10 text-gray-400">โหลดข้อมูลวันพฤหัสบดี...</div>
                         </div>
                         <div id="mobile-fri" class="mobile-day-content space-y-3 hidden">
-                             <div class="bg-white p-3 rounded-xl shadow-sm border-l-4 border-blue-400 flex justify-between items-center"><div><p class="text-xs text-gray-400">08.40-10.20 (2คาบ)</p><p class="font-bold text-gray-800">เลือกเสรี</p><p class="text-xs text-gray-500">-</p></div><div class="bg-blue-50 text-blue-600 px-2 py-1 rounded text-xs font-bold">ม.5</div></div>
-                             <div class="bg-white p-3 rounded-xl shadow-sm border-l-4 border-blue-400 flex justify-between items-center"><div><p class="text-xs text-gray-400">10.20-12.00 (2คาบ)</p><p class="font-bold text-gray-800">ว30205</p><p class="text-xs text-gray-500">ครูปิยธิดา</p></div><div class="bg-blue-50 text-blue-600 px-2 py-1 rounded text-xs font-bold">ห้อง 431</div></div>
-                             <div class="bg-gray-100 p-3 rounded-xl shadow-inner text-center text-gray-500 font-bold border border-gray-200">12.00 - 12.50 พักกลางวัน</div>
-                             <div class="bg-white p-3 rounded-xl shadow-sm border-l-4 border-blue-400 flex justify-between items-center"><div><p class="text-xs text-gray-400">12.50-13.40</p><p class="font-bold text-gray-800">ค32227</p><p class="text-xs text-gray-500">ครูสร้อยดาว</p></div><div class="bg-blue-50 text-blue-600 px-2 py-1 rounded text-xs font-bold">ห้อง 636</div></div>
-                             <div class="bg-white p-3 rounded-xl shadow-sm border-l-4 border-blue-400 flex justify-between items-center"><div><p class="text-xs text-gray-400">13.40-14.30</p><p class="font-bold text-gray-800">ส30224</p><p class="text-xs text-gray-500">ครูนัฐกร</p></div><div class="bg-blue-50 text-blue-600 px-2 py-1 rounded text-xs font-bold">ห้อง 512</div></div>
-                             <div class="bg-white p-3 rounded-xl shadow-sm border-l-4 border-blue-400 flex justify-between items-center"><div><p class="text-xs text-gray-400">14.30-15.20</p><p class="font-bold text-gray-800">โรงเรียนคุณธรรม</p><p class="text-xs text-gray-500">-</p></div><div class="bg-gray-50 text-gray-600 px-2 py-1 rounded text-xs font-bold">-</div></div>
-                             <div class="bg-white p-3 rounded-xl shadow-sm border-l-4 border-blue-400 flex justify-between items-center"><div><p class="text-xs text-gray-400">15.20-16.10</p><p class="font-bold text-gray-800">โฮมรูม</p><p class="text-xs text-gray-500">-</p></div><div class="bg-gray-50 text-gray-600 px-2 py-1 rounded text-xs font-bold">-</div></div>
+                            <div class="text-center py-10 text-gray-400">โหลดข้อมูลวันศุกร์...</div>
                         </div>
                     </div>
                 </div>
             </div>
         </div>
 
-        <!-- Section: Calendar (REPLACED Links) -->
+        <!-- SECTION: CALENDAR -->
         <div id="section-calendar" class="tab-content hidden">
-            <div class="bg-white rounded-2xl shadow-sm overflow-hidden">
-                <div class="p-6 bg-gradient-to-r from-red-500 to-pink-600 text-white">
-                    <h2 class="text-2xl font-bold"><i class="fas fa-calendar-alt mr-2"></i> ปฏิทินวิชาการ</h2>
-                    <p class="opacity-90">ภาคเรียนที่ 2/2568 (กุมภาพันธ์ - มีนาคม 2569)</p>
+            <div class="grid grid-cols-1 lg:grid-cols-12 gap-8">
+                <!-- Left: Calendar Timeline -->
+                <div class="lg:col-span-8">
+                    <div class="glass-card rounded-[32px] p-6 md:p-8 border border-white/60">
+                        <div class="flex items-center mb-8">
+                            <div class="w-12 h-12 rounded-2xl bg-gradient-to-br from-pink-500 to-rose-500 text-white flex items-center justify-center text-xl shadow-lg shadow-pink-200 mr-4">
+                                <i class="fas fa-calendar-alt"></i>
+                            </div>
+                            <div>
+                                <h2 class="text-2xl font-bold text-gray-900">ปฏิทินวิชาการ</h2>
+                                <p class="text-gray-500 font-medium">กุมภาพันธ์ - มีนาคม 2569</p>
+                            </div>
+                        </div>
+
+                        <!-- Date Header -->
+                        <div class="bg-gradient-to-r from-orange-50 to-orange-100/50 rounded-2xl p-5 mb-8 flex items-center justify-between border border-orange-100">
+                             <div class="flex items-center">
+                                 <span class="w-1.5 h-10 bg-orange-400 rounded-full mr-4 shadow-sm"></span>
+                                 <div>
+                                     <p class="text-[10px] font-bold text-orange-400 uppercase tracking-widest">TODAY</p>
+                                     <h3 class="font-bold text-gray-800 text-lg" id="today-text">13 กุมภาพันธ์ 2569</h3>
+                                 </div>
+                             </div>
+                             <i class="fas fa-sun text-3xl text-orange-300"></i>
+                        </div>
+
+                        <!-- Modern Timeline -->
+                        <div class="relative pl-8 space-y-8">
+                            <div class="timeline-line rounded-full"></div>
+
+                            <!-- Event 13 Feb -->
+                            <div class="relative pl-8 group">
+                                <div class="absolute left-[13px] top-2 w-4 h-4 rounded-full bg-white border-4 border-red-500 z-10 shadow-sm group-hover:scale-125 transition-transform"></div>
+                                <span class="text-xs font-bold text-red-500 mb-1.5 block uppercase tracking-wide">13 ก.พ. 2569</span>
+                                <div class="bg-white p-5 rounded-3xl border border-gray-100 shadow-sm hover:shadow-md transition-all">
+                                    <h4 class="font-bold text-gray-800 text-lg">เปิดบ้านวิชาการ MEP</h4>
+                                    <p class="text-sm text-gray-500 mt-1">กิจกรรม Open House แผนการเรียนภาษาอังกฤษ</p>
+                                </div>
+                            </div>
+
+                            <!-- Event 14 Feb -->
+                            <div class="relative pl-8 group">
+                                <div class="absolute left-[13px] top-2 w-4 h-4 rounded-full bg-white border-4 border-purple-500 z-10 shadow-sm group-hover:scale-125 transition-transform"></div>
+                                <span class="text-xs font-bold text-purple-600 mb-1.5 block uppercase tracking-wide">เสาร์ 14 ก.พ. 2569</span>
+                                <div class="space-y-3">
+                                    <div class="bg-purple-50/80 p-5 rounded-3xl border border-purple-100">
+                                        <div class="flex items-center mb-2">
+                                            <span class="px-2.5 py-1 rounded-lg text-[10px] font-bold bg-purple-200 text-purple-700 mr-2 shadow-sm">สำคัญ</span>
+                                            <h4 class="font-bold text-purple-800">เรียนชดเชย (ครั้งที่ 2)</h4>
+                                        </div>
+                                        <p class="text-sm text-purple-700">📌 ใช้ตารางเรียน "วันศุกร์"</p>
+                                    </div>
+                                    <div class="bg-white p-5 rounded-3xl border border-gray-100 shadow-sm">
+                                        <h4 class="font-bold text-gray-800">สอบ TPAT1 วิชาเฉพาะ กสพท</h4>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Event 16-19 Feb -->
+                            <div class="relative pl-8 group">
+                                <div class="absolute left-[13px] top-2 w-4 h-4 rounded-full bg-white border-4 border-gray-300 z-10 shadow-sm"></div>
+                                <span class="text-xs font-bold text-gray-400 mb-1.5 block uppercase tracking-wide">16-19 ก.พ. 2569</span>
+                                <div class="bg-white p-5 rounded-3xl border border-gray-100 shadow-sm">
+                                    <h4 class="font-bold text-gray-800">เรียน/สอนตามปกติ</h4>
+                                    <p class="text-sm text-gray-500">เตรียมความพร้อมก่อนสอบปลายภาค</p>
+                                </div>
+                            </div>
+
+                            <!-- Event 21 Feb -->
+                            <div class="relative pl-8 group">
+                                <div class="absolute left-[13px] top-2 w-4 h-4 rounded-full bg-white border-4 border-purple-500 z-10 shadow-sm group-hover:scale-125 transition-transform"></div>
+                                <span class="text-xs font-bold text-purple-600 mb-1.5 block uppercase tracking-wide">เสาร์ 21 ก.พ. 2569</span>
+                                <div class="bg-purple-50/80 p-5 rounded-3xl border border-purple-100">
+                                     <div class="flex items-center mb-2">
+                                        <span class="px-2.5 py-1 rounded-lg text-[10px] font-bold bg-purple-200 text-purple-700 mr-2 shadow-sm">สำคัญ</span>
+                                        <h4 class="font-bold text-purple-800">เรียนชดเชย (ครั้งที่ 3)</h4>
+                                    </div>
+                                    <p class="text-sm text-purple-700">📌 ใช้ตารางเรียน "วันอังคาร"</p>
+                                    <p class="text-xs text-purple-500 mt-1 font-medium">(ตรงกับวันสอบ O-NET ม.6)</p>
+                                </div>
+                            </div>
+
+                            <!-- Event 28 Feb -->
+                            <div class="relative pl-8 group">
+                                <div class="absolute left-[13px] top-2 w-4 h-4 rounded-full bg-white border-4 border-purple-500 z-10 shadow-sm group-hover:scale-125 transition-transform"></div>
+                                <span class="text-xs font-bold text-purple-600 mb-1.5 block uppercase tracking-wide">เสาร์ 28 ก.พ. 2569</span>
+                                <div class="bg-purple-50/80 p-5 rounded-3xl border border-purple-100">
+                                    <div class="flex items-center mb-2">
+                                        <span class="px-2.5 py-1 rounded-lg text-[10px] font-bold bg-purple-200 text-purple-700 mr-2 shadow-sm">สำคัญ</span>
+                                        <h4 class="font-bold text-purple-800">เรียนชดเชย (ครั้งที่ 4)</h4>
+                                    </div>
+                                    <p class="text-sm text-purple-700">📌 ใช้ตารางเรียน "วันศุกร์"</p>
+                                </div>
+                            </div>
+
+                            <!-- Event 2-6 Mar -->
+                            <div class="relative pl-8 group">
+                                <div class="absolute left-[13px] top-2 w-4 h-4 rounded-full bg-white border-4 border-green-500 z-10 shadow-sm group-hover:scale-125 transition-transform"></div>
+                                <span class="text-xs font-bold text-green-600 mb-1.5 block uppercase tracking-wide">2-6 มี.ค. 2569</span>
+                                <div class="bg-gradient-to-r from-green-50 to-emerald-50 p-5 rounded-3xl border border-green-100 shadow-sm">
+                                    <h4 class="font-bold text-green-800 text-lg mb-1">สอบปลายภาค 2/2568</h4>
+                                    <p class="text-sm text-green-700">สอบวัดผลปลายภาคเรียนที่ 2 (ม.1, 2, 4, 5)</p>
+                                </div>
+                            </div>
+
+                            <!-- Event 9 Mar -->
+                            <div class="relative pl-8 group">
+                                <div class="absolute left-[13px] top-2 w-4 h-4 rounded-full bg-white border-4 border-red-400 z-10 shadow-sm group-hover:scale-125 transition-transform"></div>
+                                <span class="text-xs font-bold text-red-400 mb-1.5 block uppercase tracking-wide">9 มี.ค. 2569</span>
+                                <div class="bg-white p-5 rounded-3xl border border-gray-100 shadow-sm">
+                                    <h4 class="font-bold text-gray-800">ปิดภาคเรียน 2/2568</h4>
+                                </div>
+                            </div>
+
+                            <!-- Event 11 Mar -->
+                            <div class="relative pl-8 group">
+                                <div class="absolute left-[13px] top-2 w-4 h-4 rounded-full bg-white border-4 border-orange-500 z-10 shadow-sm group-hover:scale-125 transition-transform"></div>
+                                <span class="text-xs font-bold text-orange-500 mb-1.5 block uppercase tracking-wide">11 มี.ค. 2569</span>
+                                <div class="bg-orange-50/80 p-5 rounded-3xl border border-orange-100">
+                                    <h4 class="font-bold text-orange-800"><i class="fas fa-robot mr-2"></i>อบรมหุ่นยนต์</h4>
+                                    <p class="text-sm text-orange-700">POP 32i Transportation Robot</p>
+                                </div>
+                            </div>
+
+                            <!-- Event 12 Mar -->
+                            <div class="relative pl-8 group">
+                                <div class="absolute left-[13px] top-2 w-4 h-4 rounded-full bg-white border-4 border-orange-600 z-10 shadow-sm group-hover:scale-125 transition-transform"></div>
+                                <span class="text-xs font-bold text-orange-600 mb-1.5 block uppercase tracking-wide">12 มี.ค. 2569</span>
+                                <div class="bg-orange-50/80 p-5 rounded-3xl border border-orange-100">
+                                    <h4 class="font-bold text-orange-900"><i class="fas fa-trophy mr-2"></i>KKS ROBOTICS CHAMPIONSHIP</h4>
+                                    <p class="text-sm text-orange-800">การแข่งขันหุ่นยนต์ประจำปี 2026</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
                 </div>
-                
-                <div class="p-6">
-                    <!-- Current Date Display -->
-                    <div id="current-date-display" class="mb-6 p-4 bg-yellow-50 border-l-4 border-yellow-400 rounded-r-lg flex items-center justify-between">
-                        <div>
-                            <span class="text-xs font-bold text-yellow-600 uppercase">วันนี้</span>
-                            <h3 class="text-lg font-bold text-gray-800" id="today-text">กำลังโหลด...</h3>
-                        </div>
-                        <div class="text-3xl text-yellow-400">
-                            <i class="fas fa-sun"></i>
-                        </div>
-                    </div>
 
-                    <!-- Timeline -->
-                    <div class="timeline-container relative border-l-2 border-gray-200 ml-4 space-y-8 pl-8 pb-4">
-                        
-                        <!-- Event Item -->
-                        <div class="relative group">
-                            <div class="absolute -left-[41px] bg-red-500 h-6 w-6 rounded-full border-4 border-white shadow-sm group-hover:scale-110 transition"></div>
-                            <span class="text-xs font-bold text-red-500 mb-1 block">13 ก.พ. 2569</span>
-                            <div class="bg-white p-4 rounded-xl border border-gray-100 shadow-sm hover:shadow-md transition">
-                                <h4 class="font-bold text-gray-800">เปิดบ้านวิชาการห้องเรียนพิเศษ MEP</h4>
-                                <p class="text-sm text-gray-500">กิจกรรม Open House แผนการเรียน MEP</p>
+                <!-- Right: Quick Download -->
+                <div class="lg:col-span-4">
+                    <div class="glass-card rounded-[32px] p-6 sticky top-24 border border-white/60">
+                        <h3 class="font-bold text-gray-900 mb-4">ดาวน์โหลด</h3>
+                        <a href="https://drive.google.com/drive/folders/0B-71egBy6VpfODJ4UDFBTlFnNzQ?resourcekey=0-gR-ZR5JKHEMlCI8Jd7bvaQ" target="_blank" class="flex items-center p-4 rounded-2xl bg-white border border-gray-100 hover:shadow-md transition-all group mb-4">
+                            <div class="w-10 h-10 rounded-xl bg-red-50 text-red-500 flex items-center justify-center mr-3 group-hover:bg-red-500 group-hover:text-white transition-colors">
+                                <i class="fas fa-file-pdf"></i>
                             </div>
-                        </div>
-
-                        <!-- Event Item: TPAT1 + Study Compensation -->
-                        <div class="relative group">
-                            <div class="absolute -left-[41px] bg-purple-500 h-6 w-6 rounded-full border-4 border-white shadow-sm group-hover:scale-110 transition"></div>
-                            <span class="text-xs font-bold text-purple-600 mb-1 block">เสาร์ 14 ก.พ. 2569</span>
-                            <div class="space-y-3">
-                                <!-- Study Compensation -->
-                                <div class="bg-purple-50 p-4 rounded-xl border-l-4 border-purple-500 shadow-sm hover:shadow-md transition">
-                                    <h4 class="font-bold text-purple-800 flex items-center">
-                                        <i class="fas fa-book-reader mr-2"></i> เรียนชดเชย (ครั้งที่ 2)
-                                    </h4>
-                                    <p class="text-sm text-purple-700 font-medium mt-1">📌 ใช้ตารางเรียน "วันศุกร์"</p>
-                                    <p class="text-xs text-purple-500 mt-2">อย่าลืมเตรียมหนังสือเรียนของวันศุกร์มานะครับ</p>
-                                </div>
-                                <!-- TPAT1 -->
-                                <div class="bg-white p-4 rounded-xl border border-gray-100 shadow-sm hover:shadow-md transition">
-                                    <h4 class="font-bold text-gray-800">สอบ TPAT1 วิชาเฉพาะ กสพท</h4>
-                                    <p class="text-sm text-gray-500">สำหรับนักเรียนที่สมัครสอบ</p>
-                                </div>
+                            <div>
+                                <span class="font-bold text-gray-800 text-sm block">ปฏิทินวิชาการฉบับเต็ม</span>
+                                <span class="text-xs text-gray-400">PDF File</span>
                             </div>
-                        </div>
-
-                        <!-- Event Item -->
-                        <div class="relative group">
-                            <div class="absolute -left-[41px] bg-gray-300 h-6 w-6 rounded-full border-4 border-white shadow-sm group-hover:bg-blue-400 transition"></div>
-                            <span class="text-xs font-bold text-gray-500 mb-1 block">16-19 ก.พ. 2569</span>
-                            <div class="bg-white p-4 rounded-xl border border-gray-100 shadow-sm hover:shadow-md transition">
-                                <h4 class="font-bold text-gray-800">เรียน/สอนตามปกติ</h4>
-                                <p class="text-sm text-gray-500">เตรียมความพร้อมก่อนสอบปลายภาค</p>
-                            </div>
-                        </div>
-
-                        <!-- Added Event: Study Compensation 2 -->
-                        <div class="relative group">
-                            <div class="absolute -left-[41px] bg-purple-500 h-6 w-6 rounded-full border-4 border-white shadow-sm group-hover:scale-110 transition"></div>
-                            <span class="text-xs font-bold text-purple-600 mb-1 block">เสาร์ 21 ก.พ. 2569</span>
-                            <div class="bg-purple-50 p-4 rounded-xl border-l-4 border-purple-500 shadow-sm hover:shadow-md transition">
-                                <h4 class="font-bold text-purple-800 flex items-center">
-                                    <i class="fas fa-book-reader mr-2"></i> เรียนชดเชย (ครั้งที่ 3)
-                                </h4>
-                                <p class="text-sm text-purple-700 font-medium mt-1">📌 ใช้ตารางเรียน "วันอังคาร"</p>
-                                <p class="text-xs text-purple-500 mt-2">ตรงกับวันสอบ O-NET ม.6 รอบที่ 1</p>
-                            </div>
-                        </div>
-
-                        <!-- Event Item -->
-                        <div class="relative group">
-                            <div class="absolute -left-[41px] bg-blue-500 h-6 w-6 rounded-full border-4 border-white shadow-sm group-hover:scale-110 transition"></div>
-                            <span class="text-xs font-bold text-blue-500 mb-1 block">21-22 ก.พ. 2569</span>
-                            <div class="bg-blue-50 p-4 rounded-xl border border-blue-100 shadow-sm hover:shadow-md transition">
-                                <h4 class="font-bold text-blue-800">การทดสอบ O-NET ม.6 (รอบ 1-2)</h4>
-                                <p class="text-sm text-blue-600">นักเรียน ม.5 มาเรียนชดเชยตามปกติ</p>
-                            </div>
-                        </div>
-
-                        <!-- Added Event: Study Compensation 3 -->
-                        <div class="relative group">
-                            <div class="absolute -left-[41px] bg-purple-500 h-6 w-6 rounded-full border-4 border-white shadow-sm group-hover:scale-110 transition"></div>
-                            <span class="text-xs font-bold text-purple-600 mb-1 block">เสาร์ 28 ก.พ. 2569</span>
-                            <div class="bg-purple-50 p-4 rounded-xl border-l-4 border-purple-500 shadow-sm hover:shadow-md transition">
-                                <h4 class="font-bold text-purple-800 flex items-center">
-                                    <i class="fas fa-book-reader mr-2"></i> เรียนชดเชย (ครั้งที่ 4)
-                                </h4>
-                                <p class="text-sm text-purple-700 font-medium mt-1">📌 ใช้ตารางเรียน "วันศุกร์"</p>
-                                <p class="text-xs text-purple-500 mt-2">สัปดาห์สุดท้ายก่อนสอบปลายภาค</p>
-                            </div>
-                        </div>
-
-                        <!-- Important Event Item -->
-                        <div class="relative group">
-                            <div class="absolute -left-[41px] bg-green-500 h-6 w-6 rounded-full border-4 border-white shadow-sm group-hover:scale-110 transition"></div>
-                            <span class="text-xs font-bold text-green-600 mb-1 block">2-6 มี.ค. 2569</span>
-                            <div class="bg-green-50 p-4 rounded-xl border-l-4 border-green-500 shadow-sm hover:shadow-md transition">
-                                <h4 class="font-bold text-green-800 text-lg">สอบปลายภาค 2/2568 (ม.5)</h4>
-                                <p class="text-sm text-green-700">สอบวัดผลปลายภาคเรียนที่ 2 สำหรับนักเรียนชั้น ม.1, 2, 4, 5</p>
-                                <div class="mt-2 text-xs bg-white text-green-600 px-2 py-1 rounded inline-block border border-green-200">สำคัญมาก</div>
-                            </div>
-                        </div>
-
-                        <!-- Event Item -->
-                        <div class="relative group">
-                            <div class="absolute -left-[41px] bg-red-400 h-6 w-6 rounded-full border-4 border-white shadow-sm group-hover:bg-red-500 transition"></div>
-                            <span class="text-xs font-bold text-red-400 mb-1 block">9 มี.ค. 2569</span>
-                            <div class="bg-white p-4 rounded-xl border border-gray-100 shadow-sm hover:shadow-md transition">
-                                <h4 class="font-bold text-gray-800">ปิดภาคเรียน 2/2568</h4>
-                                <p class="text-sm text-gray-500">วันสุดท้ายของปีการศึกษา</p>
-                            </div>
-                        </div>
-
-                        <!-- Added Event: Robotics Training -->
-                        <div class="relative group">
-                            <div class="absolute -left-[41px] bg-orange-500 h-6 w-6 rounded-full border-4 border-white shadow-sm group-hover:scale-110 transition"></div>
-                            <span class="text-xs font-bold text-orange-500 mb-1 block">11 มี.ค. 2569</span>
-                            <div class="bg-orange-50 p-4 rounded-xl border-l-4 border-orange-500 shadow-sm hover:shadow-md transition">
-                                <h4 class="font-bold text-orange-800 flex items-center">
-                                    <i class="fas fa-robot mr-2"></i> อบรมหุ่นยนต์
-                                </h4>
-                                <p class="text-sm text-gray-700 font-medium">เขียนโปรแกรมหุ่นยนต์ POP 32i Transportation Robot</p>
-                                <p class="text-xs text-orange-500 mt-1">เตรียมความพร้อมก่อนการแข่งขัน</p>
-                            </div>
-                        </div>
-
-                        <!-- Added Event: Robotics Competition -->
-                        <div class="relative group">
-                            <div class="absolute -left-[41px] bg-orange-600 h-6 w-6 rounded-full border-4 border-white shadow-sm group-hover:scale-110 transition"></div>
-                            <span class="text-xs font-bold text-orange-600 mb-1 block">12 มี.ค. 2569</span>
-                            <div class="bg-orange-50 p-4 rounded-xl border-l-4 border-orange-600 shadow-sm hover:shadow-md transition">
-                                <h4 class="font-bold text-orange-900 flex items-center">
-                                    <i class="fas fa-trophy mr-2"></i> KKS ROBOTICS CHAMPIONSHIP 2026
-                                </h4>
-                                <p class="text-sm text-gray-700">การแข่งขันหุ่นยนต์ประจำปี</p>
-                            </div>
-                        </div>
-                        
-                        <div class="relative group">
-                            <div class="absolute -left-[41px] bg-gray-300 h-6 w-6 rounded-full border-4 border-white shadow-sm group-hover:bg-gray-400 transition"></div>
-                            <span class="text-xs font-bold text-gray-500 mb-1 block">19-23 มี.ค. 2569</span>
-                            <div class="bg-white p-4 rounded-xl border border-gray-100 shadow-sm hover:shadow-md transition">
-                                <h4 class="font-bold text-gray-800">รับสมัครนักเรียนใหม่</h4>
-                                <p class="text-sm text-gray-500">ปีการศึกษา 2569 (ห้องเรียนปกติ)</p>
-                            </div>
-                        </div>
-
-                    </div>
-                    
-                    <div class="text-center mt-6">
-                         <a href="https://drive.google.com/drive/folders/0B-71egBy6VpfODJ4UDFBTlFnNzQ?resourcekey=0-gR-ZR5JKHEMlCI8Jd7bvaQ" target="_blank" class="inline-flex items-center text-sm text-gray-500 hover:text-blue-600 hover:underline">
-                            <i class="fas fa-external-link-alt mr-2"></i> ดูปฏิทินฉบับเต็ม (PDF)
                         </a>
                     </div>
                 </div>
             </div>
         </div>
 
-        <!-- Section: Students List (Maintained) -->
+        <!-- SECTION: STUDENTS -->
         <div id="section-students" class="tab-content hidden">
-             <div class="bg-white rounded-2xl shadow-sm overflow-hidden">
-                <div class="p-6 border-b flex justify-between items-center bg-gray-50">
-                    <div><h2 class="text-2xl font-bold text-gray-800">รายชื่อนักเรียน ม.5/6</h2><p class="text-gray-500 text-sm">ปีการศึกษา 2567 | จำนวน 40 คน</p></div>
-                    <div class="bg-white px-4 py-2 rounded-lg border text-sm font-medium shadow-sm">ครูที่ปรึกษา: <span class="text-blue-600">ครูประจำชั้น</span></div>
+            <div class="glass-card rounded-[32px] overflow-hidden shadow-xl border border-white/60">
+                <div class="p-8 bg-white border-b border-gray-100 flex flex-col sm:flex-row justify-between items-center gap-4">
+                    <div class="flex items-center">
+                        <div class="w-12 h-12 rounded-full bg-gray-100 flex items-center justify-center mr-4 text-gray-500 text-xl">
+                            <i class="fas fa-user-graduate"></i>
+                        </div>
+                        <div>
+                            <h2 class="text-2xl font-bold text-gray-900">รายชื่อเพื่อน ม.5/6</h2>
+                            <p class="text-gray-500 text-sm font-medium">ปีการศึกษา 2568 (40 คน)</p>
+                        </div>
+                    </div>
+                    <div class="px-5 py-2 rounded-2xl bg-gray-50 border border-gray-100 text-sm font-medium text-gray-600">
+                        ครูที่ปรึกษา: <span class="text-blue-600 font-bold">ครูประจำชั้น</span>
+                    </div>
                 </div>
-                <div class="p-0">
+                
+                <div class="bg-white/70 p-0 backdrop-blur-sm">
                     <div class="overflow-x-auto">
                         <table class="w-full text-left border-collapse">
                             <thead>
-                                <tr class="bg-gray-100 border-b border-gray-200 text-gray-600 uppercase text-xs tracking-wider">
-                                    <th class="px-6 py-4 font-bold w-20 text-center">เลขที่</th>
-                                    <th class="px-6 py-4 font-bold">ชื่อ - นามสกุล</th>
-                                    <th class="px-6 py-4 font-bold w-32 text-center">สถานะ</th>
+                                <tr class="bg-gray-50/80 text-gray-500 text-xs uppercase tracking-wider border-b border-gray-100 font-semibold">
+                                    <th class="px-6 py-4 w-24 text-center">#</th>
+                                    <th class="px-6 py-4">ชื่อ - นามสกุล</th>
+                                    <th class="px-6 py-4 w-32 text-center">สถานะ</th>
                                 </tr>
                             </thead>
-                            <tbody class="divide-y divide-gray-100 bg-white">
-                                <tr class="hover:bg-blue-50 transition"><td class="px-6 py-3 text-center font-bold text-gray-500">1</td><td class="px-6 py-3 font-medium text-gray-800">นางสาวกมลลักษณ์ สถานพงษ์</td><td class="px-6 py-3 text-center"><span class="px-2 py-1 bg-green-100 text-green-700 text-xs rounded-full">ปกติ</span></td></tr>
-                                <tr class="hover:bg-blue-50 transition"><td class="px-6 py-3 text-center font-bold text-gray-500">2</td><td class="px-6 py-3 font-medium text-gray-800">นางสาวชาลิสา สบายดี</td><td class="px-6 py-3 text-center"><span class="px-2 py-1 bg-green-100 text-green-700 text-xs rounded-full">ปกติ</span></td></tr>
-                                <tr class="hover:bg-blue-50 transition"><td class="px-6 py-3 text-center font-bold text-gray-500">3</td><td class="px-6 py-3 font-medium text-gray-800">นางสาวปทิตตา ระงับภัย</td><td class="px-6 py-3 text-center"><span class="px-2 py-1 bg-green-100 text-green-700 text-xs rounded-full">ปกติ</span></td></tr>
-                                <tr class="hover:bg-blue-50 transition"><td class="px-6 py-3 text-center font-bold text-gray-500">4</td><td class="px-6 py-3 font-medium text-gray-800">นายอนุภาพ พิลาพงษ์</td><td class="px-6 py-3 text-center"><span class="px-2 py-1 bg-green-100 text-green-700 text-xs rounded-full">ปกติ</span></td></tr>
-                                <tr class="hover:bg-blue-50 transition"><td class="px-6 py-3 text-center font-bold text-gray-500">5</td><td class="px-6 py-3 font-medium text-gray-800">นายวิทยาธร บุรกรณ์</td><td class="px-6 py-3 text-center"><span class="px-2 py-1 bg-green-100 text-green-700 text-xs rounded-full">ปกติ</span></td></tr>
-                                <tr class="hover:bg-blue-50 transition"><td class="px-6 py-3 text-center font-bold text-gray-500">6</td><td class="px-6 py-3 font-medium text-gray-800">นายธิติวัฒน์ เปี่ยมธราพัฒน์</td><td class="px-6 py-3 text-center"><span class="px-2 py-1 bg-green-100 text-green-700 text-xs rounded-full">ปกติ</span></td></tr>
-                                <tr class="hover:bg-blue-50 transition"><td class="px-6 py-3 text-center font-bold text-gray-500">7</td><td class="px-6 py-3 font-medium text-gray-800">นายปฏิรพ บานชื่น</td><td class="px-6 py-3 text-center"><span class="px-2 py-1 bg-green-100 text-green-700 text-xs rounded-full">ปกติ</span></td></tr>
-                                <tr class="hover:bg-blue-50 transition"><td class="px-6 py-3 text-center font-bold text-gray-500">8</td><td class="px-6 py-3 font-medium text-gray-800">นางสาวกฤษติญา อินตา</td><td class="px-6 py-3 text-center"><span class="px-2 py-1 bg-green-100 text-green-700 text-xs rounded-full">ปกติ</span></td></tr>
-                                <tr class="hover:bg-blue-50 transition"><td class="px-6 py-3 text-center font-bold text-gray-500">9</td><td class="px-6 py-3 font-medium text-gray-800">นางสาวฐิตินันท์ ไกลถิ่น</td><td class="px-6 py-3 text-center"><span class="px-2 py-1 bg-green-100 text-green-700 text-xs rounded-full">ปกติ</span></td></tr>
-                                <tr class="hover:bg-blue-50 transition"><td class="px-6 py-3 text-center font-bold text-gray-500">10</td><td class="px-6 py-3 font-medium text-gray-800">นางสาวสุพิชชา ศรีนาค</td><td class="px-6 py-3 text-center"><span class="px-2 py-1 bg-green-100 text-green-700 text-xs rounded-full">ปกติ</span></td></tr>
-                                <tr class="hover:bg-blue-50 transition"><td class="px-6 py-3 text-center font-bold text-gray-500">11</td><td class="px-6 py-3 font-medium text-gray-800">นางสาวอัจฉริยาพร สนใจ</td><td class="px-6 py-3 text-center"><span class="px-2 py-1 bg-green-100 text-green-700 text-xs rounded-full">ปกติ</span></td></tr>
-                                <tr class="hover:bg-blue-50 transition"><td class="px-6 py-3 text-center font-bold text-gray-500">12</td><td class="px-6 py-3 font-medium text-gray-800">นายกฤษณนันท์ แก้วธรรม</td><td class="px-6 py-3 text-center"><span class="px-2 py-1 bg-green-100 text-green-700 text-xs rounded-full">ปกติ</span></td></tr>
-                                <tr class="hover:bg-blue-50 transition"><td class="px-6 py-3 text-center font-bold text-gray-500">13</td><td class="px-6 py-3 font-medium text-gray-800">นายชลชาติ กันตา</td><td class="px-6 py-3 text-center"><span class="px-2 py-1 bg-green-100 text-green-700 text-xs rounded-full">ปกติ</span></td></tr>
-                                <tr class="hover:bg-blue-50 transition"><td class="px-6 py-3 text-center font-bold text-gray-500">14</td><td class="px-6 py-3 font-medium text-gray-800">นายญาณกิตต์ รับรอง</td><td class="px-6 py-3 text-center"><span class="px-2 py-1 bg-green-100 text-green-700 text-xs rounded-full">ปกติ</span></td></tr>
-                                <tr class="hover:bg-blue-50 transition"><td class="px-6 py-3 text-center font-bold text-gray-500">15</td><td class="px-6 py-3 font-medium text-gray-800">นางสาววินิดา สำรวย</td><td class="px-6 py-3 text-center"><span class="px-2 py-1 bg-green-100 text-green-700 text-xs rounded-full">ปกติ</span></td></tr>
-                                <tr class="hover:bg-blue-50 transition"><td class="px-6 py-3 text-center font-bold text-gray-500">16</td><td class="px-6 py-3 font-medium text-gray-800">นายพฤติภูมิ จันใด</td><td class="px-6 py-3 text-center"><span class="px-2 py-1 bg-green-100 text-green-700 text-xs rounded-full">ปกติ</span></td></tr>
-                                <tr class="hover:bg-blue-50 transition"><td class="px-6 py-3 text-center font-bold text-gray-500">17</td><td class="px-6 py-3 font-medium text-gray-800">นางสาวน้ำภูฟ้า คำพินิจกุลเดช</td><td class="px-6 py-3 text-center"><span class="px-2 py-1 bg-green-100 text-green-700 text-xs rounded-full">ปกติ</span></td></tr>
-                                <tr class="hover:bg-blue-50 transition"><td class="px-6 py-3 text-center font-bold text-gray-500">18</td><td class="px-6 py-3 font-medium text-gray-800">นายพงศกร นาคมาก</td><td class="px-6 py-3 text-center"><span class="px-2 py-1 bg-green-100 text-green-700 text-xs rounded-full">ปกติ</span></td></tr>
-                                <tr class="hover:bg-blue-50 transition"><td class="px-6 py-3 text-center font-bold text-gray-500">19</td><td class="px-6 py-3 font-medium text-gray-800">นายรัฐศาสตร์ รับขวัญ</td><td class="px-6 py-3 text-center"><span class="px-2 py-1 bg-green-100 text-green-700 text-xs rounded-full">ปกติ</span></td></tr>
-                                <tr class="hover:bg-blue-50 transition"><td class="px-6 py-3 text-center font-bold text-gray-500">20</td><td class="px-6 py-3 font-medium text-gray-800">นางสาวญาดา ใบธง</td><td class="px-6 py-3 text-center"><span class="px-2 py-1 bg-green-100 text-green-700 text-xs rounded-full">ปกติ</span></td></tr>
-                                <tr class="hover:bg-blue-50 transition"><td class="px-6 py-3 text-center font-bold text-gray-500">21</td><td class="px-6 py-3 font-medium text-gray-800">นายปฏิปทา พลนำ</td><td class="px-6 py-3 text-center"><span class="px-2 py-1 bg-green-100 text-green-700 text-xs rounded-full">ปกติ</span></td></tr>
-                                <tr class="hover:bg-blue-50 transition"><td class="px-6 py-3 text-center font-bold text-gray-500">22</td><td class="px-6 py-3 font-medium text-gray-800">นายกิตติพงศ์ คำโท</td><td class="px-6 py-3 text-center"><span class="px-2 py-1 bg-green-100 text-green-700 text-xs rounded-full">ปกติ</span></td></tr>
-                                <tr class="hover:bg-blue-50 transition"><td class="px-6 py-3 text-center font-bold text-gray-500">23</td><td class="px-6 py-3 font-medium text-gray-800">นายพีรพัฒน์ สมพงษ์</td><td class="px-6 py-3 text-center"><span class="px-2 py-1 bg-green-100 text-green-700 text-xs rounded-full">ปกติ</span></td></tr>
-                                <tr class="hover:bg-blue-50 transition"><td class="px-6 py-3 text-center font-bold text-gray-500">24</td><td class="px-6 py-3 font-medium text-gray-800">นายศิวัช มูลเหล็ก</td><td class="px-6 py-3 text-center"><span class="px-2 py-1 bg-green-100 text-green-700 text-xs rounded-full">ปกติ</span></td></tr>
-                                <tr class="hover:bg-blue-50 transition"><td class="px-6 py-3 text-center font-bold text-gray-500">25</td><td class="px-6 py-3 font-medium text-gray-800">นางสาวณัฐฑิตา เจริญรัมย์</td><td class="px-6 py-3 text-center"><span class="px-2 py-1 bg-green-100 text-green-700 text-xs rounded-full">ปกติ</span></td></tr>
-                                <tr class="hover:bg-blue-50 transition"><td class="px-6 py-3 text-center font-bold text-gray-500">26</td><td class="px-6 py-3 font-medium text-gray-800">นางสาวสุจิรา ปัตถา</td><td class="px-6 py-3 text-center"><span class="px-2 py-1 bg-green-100 text-green-700 text-xs rounded-full">ปกติ</span></td></tr>
-                                <tr class="hover:bg-blue-50 transition"><td class="px-6 py-3 text-center font-bold text-gray-500">27</td><td class="px-6 py-3 font-medium text-gray-800">นายวิชยุตม์ สมบัติกำไร</td><td class="px-6 py-3 text-center"><span class="px-2 py-1 bg-green-100 text-green-700 text-xs rounded-full">ปกติ</span></td></tr>
-                                <tr class="hover:bg-blue-50 transition"><td class="px-6 py-3 text-center font-bold text-gray-500">28</td><td class="px-6 py-3 font-medium text-gray-800">นายปัญจพล ทองตัน</td><td class="px-6 py-3 text-center"><span class="px-2 py-1 bg-green-100 text-green-700 text-xs rounded-full">ปกติ</span></td></tr>
-                                <tr class="hover:bg-blue-50 transition"><td class="px-6 py-3 text-center font-bold text-gray-500">29</td><td class="px-6 py-3 font-medium text-gray-800">นายธนกฤต บุตรวงศ์</td><td class="px-6 py-3 text-center"><span class="px-2 py-1 bg-green-100 text-green-700 text-xs rounded-full">ปกติ</span></td></tr>
-                                <tr class="hover:bg-blue-50 transition"><td class="px-6 py-3 text-center font-bold text-gray-500">30</td><td class="px-6 py-3 font-medium text-gray-800">นายธนาคาร เสนชัย</td><td class="px-6 py-3 text-center"><span class="px-2 py-1 bg-green-100 text-green-700 text-xs rounded-full">ปกติ</span></td></tr>
-                                <tr class="hover:bg-blue-50 transition"><td class="px-6 py-3 text-center font-bold text-gray-500">31</td><td class="px-6 py-3 font-medium text-gray-800">นายธิติวุฒิ ละออไสย์</td><td class="px-6 py-3 text-center"><span class="px-2 py-1 bg-green-100 text-green-700 text-xs rounded-full">ปกติ</span></td></tr>
-                                <tr class="hover:bg-blue-50 transition"><td class="px-6 py-3 text-center font-bold text-gray-500">32</td><td class="px-6 py-3 font-medium text-gray-800">นายปารณัท สรีโย</td><td class="px-6 py-3 text-center"><span class="px-2 py-1 bg-green-100 text-green-700 text-xs rounded-full">ปกติ</span></td></tr>
-                                <tr class="hover:bg-blue-50 transition"><td class="px-6 py-3 text-center font-bold text-gray-500">33</td><td class="px-6 py-3 font-medium text-gray-800">นายพุฒิพงศ์ เรียมทอง</td><td class="px-6 py-3 text-center"><span class="px-2 py-1 bg-green-100 text-green-700 text-xs rounded-full">ปกติ</span></td></tr>
-                                <tr class="hover:bg-blue-50 transition"><td class="px-6 py-3 text-center font-bold text-gray-500">34</td><td class="px-6 py-3 font-medium text-gray-800">นายภัทรกร บุญขาว</td><td class="px-6 py-3 text-center"><span class="px-2 py-1 bg-green-100 text-green-700 text-xs rounded-full">ปกติ</span></td></tr>
-                                <tr class="hover:bg-blue-50 transition"><td class="px-6 py-3 text-center font-bold text-gray-500">35</td><td class="px-6 py-3 font-medium text-gray-800">นายวัชรศักดิ์ มนทอง</td><td class="px-6 py-3 text-center"><span class="px-2 py-1 bg-green-100 text-green-700 text-xs rounded-full">ปกติ</span></td></tr>
-                                <tr class="hover:bg-blue-50 transition"><td class="px-6 py-3 text-center font-bold text-gray-500">36</td><td class="px-6 py-3 font-medium text-gray-800">นางสาวโมริยาห์ เหง้าใหม่</td><td class="px-6 py-3 text-center"><span class="px-2 py-1 bg-green-100 text-green-700 text-xs rounded-full">ปกติ</span></td></tr>
-                                <tr class="hover:bg-blue-50 transition"><td class="px-6 py-3 text-center font-bold text-gray-500">37</td><td class="px-6 py-3 font-medium text-gray-800">นางสาววรรษชล อุปมา</td><td class="px-6 py-3 text-center"><span class="px-2 py-1 bg-green-100 text-green-700 text-xs rounded-full">ปกติ</span></td></tr>
-                                <tr class="hover:bg-blue-50 transition"><td class="px-6 py-3 text-center font-bold text-gray-500">38</td><td class="px-6 py-3 font-medium text-gray-800">นางสาวสุวิตตา พงษ์คละ</td><td class="px-6 py-3 text-center"><span class="px-2 py-1 bg-green-100 text-green-700 text-xs rounded-full">ปกติ</span></td></tr>
-                                <tr class="hover:bg-blue-50 transition"><td class="px-6 py-3 text-center font-bold text-gray-500">39</td><td class="px-6 py-3 font-medium text-gray-800">นางสาวสุชาดา สีดาพันธ์</td><td class="px-6 py-3 text-center"><span class="px-2 py-1 bg-green-100 text-green-700 text-xs rounded-full">ปกติ</span></td></tr>
-                                <tr class="hover:bg-blue-50 transition"><td class="px-6 py-3 text-center font-bold text-gray-500">40</td><td class="px-6 py-3 font-medium text-gray-800">นางสาวจิราวรรณ ทิพพรหม</td><td class="px-6 py-3 text-center"><span class="px-2 py-1 bg-green-100 text-green-700 text-xs rounded-full">ปกติ</span></td></tr>
+                            <tbody class="divide-y divide-gray-50">
+                                <!-- Data maintained -->
+                                <tr class="hover:bg-blue-50/50 transition-colors"><td class="px-6 py-3 text-center font-bold text-gray-400">1</td><td class="px-6 py-3 font-medium text-gray-700">นางสาวกมลลักษณ์ สถานพงษ์</td><td class="px-6 py-3 text-center"><span class="px-2.5 py-1 bg-green-100 text-green-700 text-[10px] rounded-full font-bold">ปกติ</span></td></tr>
+                                <tr class="hover:bg-blue-50/50 transition-colors"><td class="px-6 py-3 text-center font-bold text-gray-400">2</td><td class="px-6 py-3 font-medium text-gray-700">นางสาวชาลิสา สบายดี</td><td class="px-6 py-3 text-center"><span class="px-2.5 py-1 bg-green-100 text-green-700 text-[10px] rounded-full font-bold">ปกติ</span></td></tr>
+                                <tr class="hover:bg-blue-50/50 transition-colors"><td class="px-6 py-3 text-center font-bold text-gray-400">3</td><td class="px-6 py-3 font-medium text-gray-700">นางสาวปทิตตา ระงับภัย</td><td class="px-6 py-3 text-center"><span class="px-2.5 py-1 bg-green-100 text-green-700 text-[10px] rounded-full font-bold">ปกติ</span></td></tr>
+                                <tr class="hover:bg-blue-50/50 transition-colors"><td class="px-6 py-3 text-center font-bold text-gray-400">4</td><td class="px-6 py-3 font-medium text-gray-700">นายอนุภาพ พิลาพงษ์</td><td class="px-6 py-3 text-center"><span class="px-2.5 py-1 bg-green-100 text-green-700 text-[10px] rounded-full font-bold">ปกติ</span></td></tr>
+                                <tr class="hover:bg-blue-50/50 transition-colors"><td class="px-6 py-3 text-center font-bold text-gray-400">5</td><td class="px-6 py-3 font-medium text-gray-700">นายวิทยาธร บุรกรณ์</td><td class="px-6 py-3 text-center"><span class="px-2.5 py-1 bg-green-100 text-green-700 text-[10px] rounded-full font-bold">ปกติ</span></td></tr>
+                                <tr class="hover:bg-blue-50/50 transition-colors"><td class="px-6 py-3 text-center font-bold text-gray-400">6</td><td class="px-6 py-3 font-medium text-gray-700">นายธิติวัฒน์ เปี่ยมธราพัฒน์</td><td class="px-6 py-3 text-center"><span class="px-2.5 py-1 bg-green-100 text-green-700 text-[10px] rounded-full font-bold">ปกติ</span></td></tr>
+                                <tr class="hover:bg-blue-50/50 transition-colors"><td class="px-6 py-3 text-center font-bold text-gray-400">7</td><td class="px-6 py-3 font-medium text-gray-700">นายปฏิรพ บานชื่น</td><td class="px-6 py-3 text-center"><span class="px-2.5 py-1 bg-green-100 text-green-700 text-[10px] rounded-full font-bold">ปกติ</span></td></tr>
+                                <tr class="hover:bg-blue-50/50 transition-colors"><td class="px-6 py-3 text-center font-bold text-gray-400">8</td><td class="px-6 py-3 font-medium text-gray-700">นางสาวกฤษติญา อินตา</td><td class="px-6 py-3 text-center"><span class="px-2.5 py-1 bg-green-100 text-green-700 text-[10px] rounded-full font-bold">ปกติ</span></td></tr>
+                                <tr class="hover:bg-blue-50/50 transition-colors"><td class="px-6 py-3 text-center font-bold text-gray-400">9</td><td class="px-6 py-3 font-medium text-gray-700">นางสาวฐิตินันท์ ไกลถิ่น</td><td class="px-6 py-3 text-center"><span class="px-2.5 py-1 bg-green-100 text-green-700 text-[10px] rounded-full font-bold">ปกติ</span></td></tr>
+                                <tr class="hover:bg-blue-50/50 transition-colors"><td class="px-6 py-3 text-center font-bold text-gray-400">10</td><td class="px-6 py-3 font-medium text-gray-700">นางสาวสุพิชชา ศรีนาค</td><td class="px-6 py-3 text-center"><span class="px-2.5 py-1 bg-green-100 text-green-700 text-[10px] rounded-full font-bold">ปกติ</span></td></tr>
+                                <tr class="hover:bg-blue-50/50 transition-colors"><td class="px-6 py-3 text-center font-bold text-gray-400">11</td><td class="px-6 py-3 font-medium text-gray-700">นางสาวอัจฉริยาพร สนใจ</td><td class="px-6 py-3 text-center"><span class="px-2.5 py-1 bg-green-100 text-green-700 text-[10px] rounded-full font-bold">ปกติ</span></td></tr>
+                                <tr class="hover:bg-blue-50/50 transition-colors"><td class="px-6 py-3 text-center font-bold text-gray-400">12</td><td class="px-6 py-3 font-medium text-gray-700">นายกฤษณนันท์ แก้วธรรม</td><td class="px-6 py-3 text-center"><span class="px-2.5 py-1 bg-green-100 text-green-700 text-[10px] rounded-full font-bold">ปกติ</span></td></tr>
+                                <tr class="hover:bg-blue-50/50 transition-colors"><td class="px-6 py-3 text-center font-bold text-gray-400">13</td><td class="px-6 py-3 font-medium text-gray-700">นายชลชาติ กันตา</td><td class="px-6 py-3 text-center"><span class="px-2.5 py-1 bg-green-100 text-green-700 text-[10px] rounded-full font-bold">ปกติ</span></td></tr>
+                                <tr class="hover:bg-blue-50/50 transition-colors"><td class="px-6 py-3 text-center font-bold text-gray-400">14</td><td class="px-6 py-3 font-medium text-gray-700">นายญาณกิตต์ รับรอง</td><td class="px-6 py-3 text-center"><span class="px-2.5 py-1 bg-green-100 text-green-700 text-[10px] rounded-full font-bold">ปกติ</span></td></tr>
+                                <tr class="hover:bg-blue-50/50 transition-colors"><td class="px-6 py-3 text-center font-bold text-gray-400">15</td><td class="px-6 py-3 font-medium text-gray-700">นางสาววินิดา สำรวย</td><td class="px-6 py-3 text-center"><span class="px-2.5 py-1 bg-green-100 text-green-700 text-[10px] rounded-full font-bold">ปกติ</span></td></tr>
+                                <tr class="hover:bg-blue-50/50 transition-colors"><td class="px-6 py-3 text-center font-bold text-gray-400">16</td><td class="px-6 py-3 font-medium text-gray-700">นายพฤติภูมิ จันใด</td><td class="px-6 py-3 text-center"><span class="px-2.5 py-1 bg-green-100 text-green-700 text-[10px] rounded-full font-bold">ปกติ</span></td></tr>
+                                <tr class="hover:bg-blue-50/50 transition-colors"><td class="px-6 py-3 text-center font-bold text-gray-400">17</td><td class="px-6 py-3 font-medium text-gray-700">นางสาวน้ำภูฟ้า คำพินิจกุลเดช</td><td class="px-6 py-3 text-center"><span class="px-2.5 py-1 bg-green-100 text-green-700 text-[10px] rounded-full font-bold">ปกติ</span></td></tr>
+                                <tr class="hover:bg-blue-50/50 transition-colors"><td class="px-6 py-3 text-center font-bold text-gray-400">18</td><td class="px-6 py-3 font-medium text-gray-700">นายพงศกร นาคมาก</td><td class="px-6 py-3 text-center"><span class="px-2.5 py-1 bg-green-100 text-green-700 text-[10px] rounded-full font-bold">ปกติ</span></td></tr>
+                                <tr class="hover:bg-blue-50/50 transition-colors"><td class="px-6 py-3 text-center font-bold text-gray-400">19</td><td class="px-6 py-3 font-medium text-gray-700">นายรัฐศาสตร์ รับขวัญ</td><td class="px-6 py-3 text-center"><span class="px-2.5 py-1 bg-green-100 text-green-700 text-[10px] rounded-full font-bold">ปกติ</span></td></tr>
+                                <tr class="hover:bg-blue-50/50 transition-colors"><td class="px-6 py-3 text-center font-bold text-gray-400">20</td><td class="px-6 py-3 font-medium text-gray-700">นางสาวญาดา ใบธง</td><td class="px-6 py-3 text-center"><span class="px-2.5 py-1 bg-green-100 text-green-700 text-[10px] rounded-full font-bold">ปกติ</span></td></tr>
+                                <tr class="hover:bg-blue-50/50 transition-colors"><td class="px-6 py-3 text-center font-bold text-gray-400">21</td><td class="px-6 py-3 font-medium text-gray-700">นายปฏิปทา พลนำ</td><td class="px-6 py-3 text-center"><span class="px-2.5 py-1 bg-green-100 text-green-700 text-[10px] rounded-full font-bold">ปกติ</span></td></tr>
+                                <tr class="hover:bg-blue-50/50 transition-colors"><td class="px-6 py-3 text-center font-bold text-gray-400">22</td><td class="px-6 py-3 font-medium text-gray-700">นายกิตติพงศ์ คำโท</td><td class="px-6 py-3 text-center"><span class="px-2.5 py-1 bg-green-100 text-green-700 text-[10px] rounded-full font-bold">ปกติ</span></td></tr>
+                                <tr class="hover:bg-blue-50/50 transition-colors"><td class="px-6 py-3 text-center font-bold text-gray-400">23</td><td class="px-6 py-3 font-medium text-gray-700">นายพีรพัฒน์ สมพงษ์</td><td class="px-6 py-3 text-center"><span class="px-2.5 py-1 bg-green-100 text-green-700 text-[10px] rounded-full font-bold">ปกติ</span></td></tr>
+                                <tr class="hover:bg-blue-50/50 transition-colors"><td class="px-6 py-3 text-center font-bold text-gray-400">24</td><td class="px-6 py-3 font-medium text-gray-700">นายศิวัช มูลเหล็ก</td><td class="px-6 py-3 text-center"><span class="px-2.5 py-1 bg-green-100 text-green-700 text-[10px] rounded-full font-bold">ปกติ</span></td></tr>
+                                <tr class="hover:bg-blue-50/50 transition-colors"><td class="px-6 py-3 text-center font-bold text-gray-400">25</td><td class="px-6 py-3 font-medium text-gray-700">นางสาวณัฐฑิตา เจริญรัมย์</td><td class="px-6 py-3 text-center"><span class="px-2.5 py-1 bg-green-100 text-green-700 text-[10px] rounded-full font-bold">ปกติ</span></td></tr>
+                                <tr class="hover:bg-blue-50/50 transition-colors"><td class="px-6 py-3 text-center font-bold text-gray-400">26</td><td class="px-6 py-3 font-medium text-gray-700">นางสาวสุจิรา ปัตถา</td><td class="px-6 py-3 text-center"><span class="px-2.5 py-1 bg-green-100 text-green-700 text-[10px] rounded-full font-bold">ปกติ</span></td></tr>
+                                <tr class="hover:bg-blue-50/50 transition-colors"><td class="px-6 py-3 text-center font-bold text-gray-400">27</td><td class="px-6 py-3 font-medium text-gray-700">นายวิชยุตม์ สมบัติกำไร</td><td class="px-6 py-3 text-center"><span class="px-2.5 py-1 bg-green-100 text-green-700 text-[10px] rounded-full font-bold">ปกติ</span></td></tr>
+                                <tr class="hover:bg-blue-50/50 transition-colors"><td class="px-6 py-3 text-center font-bold text-gray-400">28</td><td class="px-6 py-3 font-medium text-gray-700">นายปัญจพล ทองตัน</td><td class="px-6 py-3 text-center"><span class="px-2.5 py-1 bg-green-100 text-green-700 text-[10px] rounded-full font-bold">ปกติ</span></td></tr>
+                                <tr class="hover:bg-blue-50/50 transition-colors"><td class="px-6 py-3 text-center font-bold text-gray-400">29</td><td class="px-6 py-3 font-medium text-gray-700">นายธนกฤต บุตรวงศ์</td><td class="px-6 py-3 text-center"><span class="px-2.5 py-1 bg-green-100 text-green-700 text-[10px] rounded-full font-bold">ปกติ</span></td></tr>
+                                <tr class="hover:bg-blue-50/50 transition-colors"><td class="px-6 py-3 text-center font-bold text-gray-400">30</td><td class="px-6 py-3 font-medium text-gray-700">นายธนาคาร เสนชัย</td><td class="px-6 py-3 text-center"><span class="px-2.5 py-1 bg-green-100 text-green-700 text-[10px] rounded-full font-bold">ปกติ</span></td></tr>
+                                <tr class="hover:bg-blue-50/50 transition-colors"><td class="px-6 py-3 text-center font-bold text-gray-400">31</td><td class="px-6 py-3 font-medium text-gray-700">นายธิติวุฒิ ละออไสย์</td><td class="px-6 py-3 text-center"><span class="px-2.5 py-1 bg-green-100 text-green-700 text-[10px] rounded-full font-bold">ปกติ</span></td></tr>
+                                <tr class="hover:bg-blue-50/50 transition-colors"><td class="px-6 py-3 text-center font-bold text-gray-400">32</td><td class="px-6 py-3 font-medium text-gray-700">นายปารณัท สรีโย</td><td class="px-6 py-3 text-center"><span class="px-2.5 py-1 bg-green-100 text-green-700 text-[10px] rounded-full font-bold">ปกติ</span></td></tr>
+                                <tr class="hover:bg-blue-50/50 transition-colors"><td class="px-6 py-3 text-center font-bold text-gray-400">33</td><td class="px-6 py-3 font-medium text-gray-700">นายพุฒิพงศ์ เรียมทอง</td><td class="px-6 py-3 text-center"><span class="px-2.5 py-1 bg-green-100 text-green-700 text-[10px] rounded-full font-bold">ปกติ</span></td></tr>
+                                <tr class="hover:bg-blue-50/50 transition-colors"><td class="px-6 py-3 text-center font-bold text-gray-400">34</td><td class="px-6 py-3 font-medium text-gray-700">นายภัทรกร บุญขาว</td><td class="px-6 py-3 text-center"><span class="px-2.5 py-1 bg-green-100 text-green-700 text-[10px] rounded-full font-bold">ปกติ</span></td></tr>
+                                <tr class="hover:bg-blue-50/50 transition-colors"><td class="px-6 py-3 text-center font-bold text-gray-400">35</td><td class="px-6 py-3 font-medium text-gray-700">นายวัชรศักดิ์ มนทอง</td><td class="px-6 py-3 text-center"><span class="px-2.5 py-1 bg-green-100 text-green-700 text-[10px] rounded-full font-bold">ปกติ</span></td></tr>
+                                <tr class="hover:bg-blue-50/50 transition-colors"><td class="px-6 py-3 text-center font-bold text-gray-400">36</td><td class="px-6 py-3 font-medium text-gray-700">นางสาวโมริยาห์ เหง้าใหม่</td><td class="px-6 py-3 text-center"><span class="px-2.5 py-1 bg-green-100 text-green-700 text-[10px] rounded-full font-bold">ปกติ</span></td></tr>
+                                <tr class="hover:bg-blue-50/50 transition-colors"><td class="px-6 py-3 text-center font-bold text-gray-400">37</td><td class="px-6 py-3 font-medium text-gray-700">นางสาววรรษชล อุปมา</td><td class="px-6 py-3 text-center"><span class="px-2.5 py-1 bg-green-100 text-green-700 text-[10px] rounded-full font-bold">ปกติ</span></td></tr>
+                                <tr class="hover:bg-blue-50/50 transition-colors"><td class="px-6 py-3 text-center font-bold text-gray-400">38</td><td class="px-6 py-3 font-medium text-gray-700">นางสาวสุวิตตา พงษ์คละ</td><td class="px-6 py-3 text-center"><span class="px-2.5 py-1 bg-green-100 text-green-700 text-[10px] rounded-full font-bold">ปกติ</span></td></tr>
+                                <tr class="hover:bg-blue-50/50 transition-colors"><td class="px-6 py-3 text-center font-bold text-gray-400">39</td><td class="px-6 py-3 font-medium text-gray-700">นางสาวสุชาดา สีดาพันธ์</td><td class="px-6 py-3 text-center"><span class="px-2.5 py-1 bg-green-100 text-green-700 text-[10px] rounded-full font-bold">ปกติ</span></td></tr>
+                                <tr class="hover:bg-blue-50/50 transition-colors"><td class="px-6 py-3 text-center font-bold text-gray-400">40</td><td class="px-6 py-3 font-medium text-gray-700">นางสาวจิราวรรณ ทิพพรหม</td><td class="px-6 py-3 text-center"><span class="px-2.5 py-1 bg-green-100 text-green-700 text-[10px] rounded-full font-bold">ปกติ</span></td></tr>
                             </tbody>
                         </table>
                     </div>
@@ -603,33 +806,51 @@
     </div>
 
     <!-- Footer -->
-    <footer class="bg-gray-800 text-gray-400 py-10 mt-12 text-center">
-        <p class="mb-2">© 2026 มัธยมศึกษาปีที่ 5/6 (ปีการศึกษา 2568) - ข้อมูลเพื่อการเรียนการสอนเท่านั้น</p>
-        <p class="text-xs">อัปเดตล่าสุด: 13 กุมภาพันธ์ 2569</p>
+    <footer class="mt-12 py-8 bg-white/60 border-t border-gray-200 backdrop-blur-sm">
+        <div class="max-w-7xl mx-auto px-4 text-center">
+            <p class="text-gray-600 font-medium">© 2026 มัธยมศึกษาปีที่ 5/6 (ปีการศึกษา 2568)</p>
+            <p class="text-xs text-gray-400 mt-2">โรงเรียนขุขันธ์ | ข้อมูลเพื่อการเรียนการสอนเท่านั้น</p>
+            <p class="text-[10px] text-gray-300 mt-1">อัปเดตล่าสุด: 13 กุมภาพันธ์ 2569</p>
+        </div>
     </footer>
 
     <script>
         function showSection(sectionId) {
+            // Hide all first
             document.querySelectorAll('.tab-content').forEach(section => {
                 section.classList.add('hidden');
             });
-            document.getElementById('section-' + sectionId).classList.remove('hidden');
             
-            // Update desktop nav state
-            document.querySelectorAll('.nav-link').forEach(link => {
-                link.classList.remove('nav-active', 'text-blue-600');
-                link.classList.add('text-gray-500');
-            });
+            // Show target
+            const target = document.getElementById('section-' + sectionId);
+            target.classList.remove('hidden');
             
-            // Safe check because mobile links don't have IDs
-            const activeLink = document.getElementById('link-' + sectionId);
-            if (activeLink) {
-                activeLink.classList.add('nav-active', 'text-blue-600');
+            // Update nav state
+            updateNavState(sectionId);
+            
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+
+        // Sliding Marker Logic
+        function updateNavState(activeId) {
+            const activeLink = document.getElementById('link-' + activeId);
+            const marker = document.getElementById('nav-marker');
+            
+            if (activeLink && marker) {
+                // Remove active class from all
+                document.querySelectorAll('.nav-link').forEach(link => {
+                    link.classList.remove('text-gray-900', 'font-bold');
+                    link.classList.add('text-gray-500');
+                });
+                
+                // Add active style
                 activeLink.classList.remove('text-gray-500');
+                activeLink.classList.add('text-gray-900', 'font-bold');
+
+                // Move Marker
+                marker.style.width = activeLink.offsetWidth + 'px';
+                marker.style.left = activeLink.offsetLeft + 'px';
             }
-            
-            // Scroll to top
-            window.scrollTo(0, 0);
         }
 
         function toggleMobileMenu() {
@@ -638,51 +859,81 @@
         }
 
         function selectMobileDay(day) {
-            document.querySelectorAll('.mobile-day-content').forEach(content => {
-                content.classList.add('hidden');
-            });
-            document.getElementById('mobile-' + day).classList.remove('hidden');
+            // Logic to switch mobile tabs
+            document.querySelectorAll('.mobile-day-content').forEach(content => content.classList.add('hidden'));
+            const targetContent = document.getElementById('mobile-' + day);
+            if(targetContent) targetContent.classList.remove('hidden');
 
             document.querySelectorAll('.mobile-tab').forEach(tab => {
-                tab.className = 'mobile-tab flex-1 min-w-[80px] py-2 px-4 rounded-lg text-sm font-bold bg-white text-gray-500 border border-gray-200 transition';
+                tab.className = 'mobile-tab flex-shrink-0 px-5 py-2.5 rounded-full text-sm font-bold bg-white text-gray-500 border border-gray-200 transition-all hover:bg-gray-50';
             });
 
             const colors = {
-                'mon': 'bg-yellow-400 text-white border-yellow-400',
-                'tue': 'bg-pink-400 text-white border-pink-400',
-                'wed': 'bg-green-400 text-white border-green-400',
-                'thu': 'bg-orange-400 text-white border-orange-400',
-                'fri': 'bg-blue-400 text-white border-blue-400'
+                'mon': 'bg-yellow-400 text-white border-yellow-400 shadow-md transform scale-105',
+                'tue': 'bg-pink-400 text-white border-pink-400 shadow-md transform scale-105',
+                'wed': 'bg-green-400 text-white border-green-400 shadow-md transform scale-105',
+                'thu': 'bg-orange-400 text-white border-orange-400 shadow-md transform scale-105',
+                'fri': 'bg-blue-400 text-white border-blue-400 shadow-md transform scale-105'
             };
             
-            document.getElementById('tab-' + day).className = `mobile-tab flex-1 min-w-[80px] py-2 px-4 rounded-lg text-sm font-bold shadow-sm transition ${colors[day]}`;
+            document.getElementById('tab-' + day).className = `mobile-tab flex-shrink-0 px-5 py-2.5 rounded-full text-sm font-bold transition-all ${colors[day]}`;
         }
 
-        // Script to display current date and upcoming events
+        /* --- DOOR ANIMATION SCRIPT --- */
         document.addEventListener('DOMContentLoaded', function() {
+            // Initialize Nav Marker Position
+            setTimeout(() => updateNavState('home'), 100);
+
+            const overlay = document.getElementById('door-overlay');
             const dateOptions = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
             const today = new Date();
-            // Force Thai date locale
-            document.getElementById('today-text').textContent = today.toLocaleDateString('th-TH', dateOptions);
+            if(document.getElementById('today-text')) {
+                document.getElementById('today-text').textContent = today.toLocaleDateString('th-TH', dateOptions);
+            }
 
-            // Simple logic for the mini-widget
-            // In a real app, this would compare dates dynamically.
-            // For this static demo, we'll set it based on "now" assumption.
-            // Assuming current date for demo is roughly mid-Feb
-            
             const miniEventWidget = document.getElementById('today-event-mini');
-            // Mock check
-            miniEventWidget.innerHTML = `
-                <div class="flex justify-between border-b border-gray-100 pb-2 mb-2">
-                    <span>วันนี้:</span>
-                    <span class="font-bold text-gray-800">เรียนตามปกติ</span>
-                </div>
-                <div class="flex justify-between text-gray-500">
-                    <span>เร็วๆ นี้:</span>
-                    <span class="font-bold text-red-500">สอบปลายภาค (2 มี.ค.)</span>
-                </div>
-            `;
+            if(miniEventWidget) {
+                miniEventWidget.innerHTML = `
+                    <div class="flex items-start mb-3 pb-3 border-b border-gray-200/50">
+                        <div class="w-8 h-8 rounded-lg bg-green-100 flex items-center justify-center text-green-600 mr-3 flex-shrink-0">
+                            <i class="fas fa-school"></i>
+                        </div>
+                        <div>
+                            <p class="text-xs text-gray-500 font-medium uppercase tracking-wide">สถานะวันนี้</p>
+                            <p class="font-bold text-gray-800 text-sm">เรียนตามปกติ</p>
+                        </div>
+                    </div>
+                    <div class="flex items-start">
+                        <div class="w-8 h-8 rounded-lg bg-red-100 flex items-center justify-center text-red-500 mr-3 flex-shrink-0">
+                            <i class="fas fa-exclamation-circle"></i>
+                        </div>
+                        <div>
+                            <p class="text-xs text-gray-500 font-medium uppercase tracking-wide">เร็วๆ นี้</p>
+                            <p class="font-bold text-red-500 text-sm">สอบปลายภาค (2 มี.ค.)</p>
+                        </div>
+                    </div>
+                `;
+            }
+
+            // Open Door on Load
+            setTimeout(() => {
+                overlay.classList.add('doors-open');
+            }, 600);
         });
+
+        // Function to trigger door close and redirect
+        function transitionToPage(url) {
+            const overlay = document.getElementById('door-overlay');
+            
+            // Bring doors back to closed state
+            overlay.classList.remove('doors-open');
+            overlay.classList.add('is-transitioning');
+            
+            // Wait for animation (0.8s) then redirect
+            setTimeout(() => {
+                window.location.href = url;
+            }, 800); 
+        }
     </script>
 </body>
 </html>
