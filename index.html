@@ -9,107 +9,177 @@
     <link href="https://fonts.googleapis.com/css2?family=Sarabun:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <script>
         tailwind.config = {
+            darkMode: 'class',
             theme: {
                 extend: {
                     fontFamily: {
                         sans: ['Sarabun', 'sans-serif'],
                     },
                     colors: {
-                        primary: '#007AFF', // iOS Blue
-                        secondary: '#5856D6', // iOS Purple
+                        primary: '#007AFF',
+                        secondary: '#5856D6',
                     }
                 }
             }
         }
     </script>
     <style>
+        /* --- Base Variables & Default Theme (Light) --- */
+        :root {
+            --bg-color: #F2F2F7;
+            --text-main: #1f2937;
+            --text-sub: #6b7280;
+            --glass-bg: rgba(255, 255, 255, 0.75);
+            --glass-border: rgba(255, 255, 255, 0.5);
+            --nav-bg: rgba(255, 255, 255, 0.85);
+            --card-bg: #ffffff;
+            --marker-bg: #ffffff;
+            --shadow-color: rgba(0, 0, 0, 0.05);
+            --accent-color: #007AFF;
+            --table-hover: #f9fafb;
+            --input-bg: #f3f4f6;
+        }
+
+        /* --- Dark Red Theme --- */
+        body.theme-dark-red {
+            --bg-color: #1a0505;
+            --text-main: #f3f4f6;
+            --text-sub: #9ca3af;
+            --glass-bg: rgba(40, 10, 10, 0.85);
+            --glass-border: rgba(255, 100, 100, 0.2);
+            --nav-bg: rgba(30, 5, 5, 0.9);
+            --card-bg: rgba(45, 15, 15, 0.95);
+            --marker-bg: rgba(200, 50, 50, 1);
+            --shadow-color: rgba(0, 0, 0, 0.8);
+            --accent-color: #ef4444;
+            --table-hover: rgba(255, 255, 255, 0.05);
+            --input-bg: rgba(0, 0, 0, 0.3);
+            background-image: 
+                radial-gradient(at 0% 0%, rgba(153, 27, 27, 0.3) 0px, transparent 50%),
+                radial-gradient(at 100% 100%, rgba(127, 29, 29, 0.2) 0px, transparent 50%);
+        }
+
+        /* --- Dark Purple Theme --- */
+        body.theme-dark-purple {
+            --bg-color: #0f0518;
+            --text-main: #e9d5ff;
+            --text-sub: #a8a29e;
+            --glass-bg: rgba(30, 15, 50, 0.85);
+            --glass-border: rgba(168, 85, 247, 0.25);
+            --nav-bg: rgba(20, 10, 35, 0.9);
+            --card-bg: rgba(35, 20, 60, 0.95);
+            --marker-bg: rgba(147, 51, 234, 1);
+            --shadow-color: rgba(0, 0, 0, 0.8);
+            --accent-color: #a855f7;
+            --table-hover: rgba(255, 255, 255, 0.05);
+            --input-bg: rgba(0, 0, 0, 0.3);
+            background-image: 
+                radial-gradient(at 0% 0%, rgba(107, 33, 168, 0.3) 0px, transparent 50%),
+                radial-gradient(at 100% 0%, rgba(76, 29, 149, 0.3) 0px, transparent 50%);
+        }
+
         body {
-            background-color: #F2F2F7; /* iOS System Gray 6 */
+            background-color: var(--bg-color);
+            color: var(--text-main);
             background-image: 
                 radial-gradient(at 0% 0%, rgba(0, 122, 255, 0.15) 0px, transparent 50%),
                 radial-gradient(at 100% 0%, rgba(88, 86, 214, 0.15) 0px, transparent 50%),
                 radial-gradient(at 100% 100%, rgba(52, 199, 89, 0.1) 0px, transparent 50%);
             background-attachment: fixed;
             -webkit-font-smoothing: antialiased;
+            padding-top: 140px; 
+            transition: background-color 0.5s ease, color 0.3s ease;
+        }
+        @media (min-width: 768px) {
+            body { padding-top: 0; }
         }
         
-        /* iOS Glass Effect */
+        body.theme-dark-red, body.theme-dark-purple {
+            background-attachment: fixed;
+        }
+
+        /* --- Global Component Styles --- */
         .glass-nav {
-            background: rgba(255, 255, 255, 0.65);
+            background: var(--nav-bg);
             backdrop-filter: saturate(180%) blur(20px);
             -webkit-backdrop-filter: saturate(180%) blur(20px);
-            border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+            border-bottom: 1px solid var(--glass-border);
         }
 
         .glass-card {
-            background: rgba(255, 255, 255, 0.7);
+            background: var(--glass-bg);
             backdrop-filter: saturate(180%) blur(20px);
             -webkit-backdrop-filter: saturate(180%) blur(20px);
-            border: 1px solid rgba(255, 255, 255, 0.4);
-            box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.07);
+            border: 1px solid var(--glass-border);
+            box-shadow: 0 8px 32px 0 var(--shadow-color);
         }
 
-        /* Nav Link Styling */
-        .nav-link {
+        .nav-link, .mobile-nav-link {
             position: relative;
-            color: #8E8E93; /* iOS Gray */
+            color: var(--text-sub);
             transition: color 0.3s ease;
             z-index: 10;
             font-weight: 500;
+            white-space: nowrap;
         }
         
-        .nav-link:hover {
-            color: #007AFF;
+        .nav-link:hover, .mobile-nav-link:hover {
+            color: var(--accent-color);
         }
 
-        .nav-active {
-            color: #007AFF; /* iOS Blue */
-            font-weight: 600;
+        .nav-text-active {
+            color: var(--accent-color) !important;
+            font-weight: 700 !important;
+        }
+        
+        body.theme-dark-red .nav-text-active, 
+        body.theme-dark-purple .nav-text-active {
+            color: #ffffff !important;
         }
 
-        /* Sliding Marker Animation */
-        #nav-marker {
+        #nav-marker, #mobile-nav-marker {
             position: absolute;
-            bottom: 0; /* Or vertically centered for pill shape */
-            left: 0;
-            height: 32px; /* Pill height */
-            background: rgba(255, 255, 255, 0.8);
+            background: var(--marker-bg);
             border-radius: 99px;
-            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+            box-shadow: 0 2px 8px var(--shadow-color);
             transition: all 0.4s cubic-bezier(0.25, 0.8, 0.25, 1);
             z-index: 1;
-            /* Center vertically */
-            top: 50%;
-            transform: translateY(-50%);
         }
 
-        /* Timeline Customization */
         .timeline-line {
             position: absolute;
             left: 20px;
             top: 0;
             bottom: 0;
             width: 2px;
-            background: linear-gradient(to bottom, #e5e7eb 0%, #d1d5db 50%, #e5e7eb 100%);
+            background: linear-gradient(to bottom, transparent 0%, var(--text-sub) 50%, transparent 100%);
+            opacity: 0.3;
         }
 
         .hover-lift {
             transition: transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1), box-shadow 0.3s ease;
         }
-        
         .hover-lift:hover {
             transform: scale(1.02);
-            box-shadow: 0 10px 30px -10px rgba(0, 0, 0, 0.15);
+            box-shadow: 0 10px 30px -10px var(--shadow-color);
         }
 
-        /* Hide Scrollbar */
-        .scrollbar-hide::-webkit-scrollbar {
-            display: none;
+        #settings-modal {
+            background: rgba(0,0,0,0.6);
+            backdrop-filter: blur(5px);
         }
-        .scrollbar-hide {
-            -ms-overflow-style: none;
-            scrollbar-width: none;
+        
+        .theme-btn {
+            border: 2px solid transparent;
+            transition: all 0.2s;
         }
+        .theme-btn.active {
+            border-color: var(--accent-color);
+            transform: scale(1.05);
+        }
+
+        .scrollbar-hide::-webkit-scrollbar { display: none; }
+        .scrollbar-hide { -ms-overflow-style: none; scrollbar-width: none; }
 
         /* Door Animation */
         #door-overlay {
@@ -119,29 +189,25 @@
             display: flex;
             pointer-events: none;
         }
-        #door-overlay.is-transitioning {
-            pointer-events: auto;
-        }
+        #door-overlay.is-transitioning { pointer-events: auto; }
+        
         .door-panel {
             width: 50%;
             height: 100%;
-            background: #F2F2F7; /* Match body bg for seamless feel */
+            background: #F2F2F7; 
             position: relative;
             transition: transform 0.8s cubic-bezier(0.83, 0, 0.17, 1);
             will-change: transform;
             display: flex;
             align-items: center;
-            border-right: 1px solid rgba(0,0,0,0.05); /* Subtle seam */
+            border-right: 1px solid rgba(0,0,0,0.05);
         }
-        .door-left {
-            transform: translateX(0);
-            justify-content: flex-end;
-        }
-        .door-right {
-            transform: translateX(0);
-            justify-content: flex-start;
-            border-left: 1px solid rgba(0,0,0,0.05);
-        }
+        
+        body.theme-dark-red .door-panel { background: #1a0505; border-color: rgba(255,255,255,0.1); }
+        body.theme-dark-purple .door-panel { background: #0f0518; border-color: rgba(255,255,255,0.1); }
+
+        .door-left { transform: translateX(0); justify-content: flex-end; }
+        .door-right { transform: translateX(0); justify-content: flex-start; border-left: 1px solid rgba(0,0,0,0.05); }
         .doors-open .door-left { transform: translateX(-100%); }
         .doors-open .door-right { transform: translateX(100%); }
         
@@ -157,29 +223,11 @@
         }
         #door-overlay.is-transitioning .loading-container { opacity: 1; }
         
-        /* Apple-style spinner */
-        .spinner {
-            width: 40px;
-            height: 40px;
-            position: relative;
-            margin: 0 auto;
-        }
-        .spinner div {
-            transform-origin: 20px 20px;
-            animation: spinner-fade 1.2s linear infinite;
-        }
+        .spinner { width: 40px; height: 40px; position: relative; margin: 0 auto; }
+        .spinner div { transform-origin: 20px 20px; animation: spinner-fade 1.2s linear infinite; }
         .spinner div:after {
-            content: " ";
-            display: block;
-            position: absolute;
-            top: 3px;
-            left: 18px;
-            width: 4px;
-            height: 10px;
-            border-radius: 20%;
-            background: #8E8E93;
+            content: " "; display: block; position: absolute; top: 3px; left: 18px; width: 4px; height: 10px; border-radius: 20%; background: var(--text-sub);
         }
-        /* Generate 12 blades positions (simple CSS loop approx) */
         .spinner div:nth-child(1) { transform: rotate(0deg); animation-delay: -1.1s; }
         .spinner div:nth-child(2) { transform: rotate(30deg); animation-delay: -1.0s; }
         .spinner div:nth-child(3) { transform: rotate(60deg); animation-delay: -0.9s; }
@@ -192,24 +240,85 @@
         .spinner div:nth-child(10) { transform: rotate(270deg); animation-delay: -0.2s; }
         .spinner div:nth-child(11) { transform: rotate(300deg); animation-delay: -0.1s; }
         .spinner div:nth-child(12) { transform: rotate(330deg); animation-delay: 0s; }
-        @keyframes spinner-fade {
-            0% { opacity: 1; }
-            100% { opacity: 0; }
+        @keyframes spinner-fade { 0% { opacity: 1; } 100% { opacity: 0; } }
+
+        .tab-content { animation: fadeIn 0.5s cubic-bezier(0.25, 1, 0.5, 1); }
+        @keyframes fadeIn { from { opacity: 0; transform: scale(0.98) translateY(10px); } to { opacity: 1; transform: scale(1) translateY(0); } }
+        
+        /* --- Dark Mode Overrides to Fix White Spots --- */
+        body.theme-dark-red .bg-white, 
+        body.theme-dark-purple .bg-white { 
+            background-color: var(--card-bg) !important; 
+            border-color: var(--glass-border) !important;
+            color: var(--text-main);
+        }
+        
+        body.theme-dark-red .text-gray-900, 
+        body.theme-dark-purple .text-gray-900,
+        body.theme-dark-red .text-gray-800, 
+        body.theme-dark-purple .text-gray-800,
+        body.theme-dark-red .text-gray-700, 
+        body.theme-dark-purple .text-gray-700 {
+            color: #ffffff !important;
         }
 
-        /* Tab Content Animation */
-        .tab-content {
-            animation: fadeIn 0.5s cubic-bezier(0.25, 1, 0.5, 1);
+        body.theme-dark-red .text-gray-600, 
+        body.theme-dark-purple .text-gray-600,
+        body.theme-dark-red .text-gray-500, 
+        body.theme-dark-purple .text-gray-500 {
+            color: #cccccc !important;
         }
-        @keyframes fadeIn {
-            from { opacity: 0; transform: scale(0.98) translateY(10px); }
-            to { opacity: 1; transform: scale(1) translateY(0); }
+
+        body.theme-dark-red .bg-gray-50, body.theme-dark-purple .bg-gray-50,
+        body.theme-dark-red .bg-gray-100, body.theme-dark-purple .bg-gray-100 {
+            background-color: rgba(255,255,255,0.1) !important;
+            color: #fff;
+        }
+
+        body.theme-dark-red .bg-white\/60, body.theme-dark-purple .bg-white\/60 {
+            background-color: rgba(0,0,0,0.4) !important;
+        }
+        
+        /* Table overrides */
+        body.theme-dark-red tr:hover, body.theme-dark-purple tr:hover {
+            background-color: var(--table-hover) !important;
         }
     </style>
 </head>
 <body class="text-gray-800 antialiased overflow-x-hidden">
 
-    <!-- Door Overlay (Updated visual style) -->
+    <!-- Settings Modal -->
+    <div id="settings-modal" class="fixed inset-0 z-[10000] hidden flex items-center justify-center opacity-0 transition-opacity duration-300">
+        <div class="rounded-3xl p-6 w-full max-w-sm mx-4 shadow-2xl transform scale-95 transition-transform duration-300" id="settings-content" style="background: var(--card-bg); border: 1px solid var(--glass-border); backdrop-filter: blur(20px);">
+            <div class="flex justify-between items-center mb-6">
+                <h3 class="text-xl font-bold" style="color: var(--text-main);">ตั้งค่าธีม</h3>
+                <button onclick="toggleSettings()" class="text-gray-500 hover:text-red-500 transition-colors">
+                    <i class="fas fa-times text-xl"></i>
+                </button>
+            </div>
+            
+            <div class="grid grid-cols-3 gap-4 mb-6">
+                <button onclick="setTheme('light')" class="theme-btn flex flex-col items-center p-3 rounded-2xl bg-gray-100" id="btn-theme-light">
+                    <div class="w-10 h-10 rounded-full bg-white border border-gray-300 shadow-sm mb-2"></div>
+                    <span class="text-xs font-bold text-gray-600">สว่าง</span>
+                </button>
+                <button onclick="setTheme('dark-red')" class="theme-btn flex flex-col items-center p-3 rounded-2xl bg-gray-800" id="btn-theme-dark-red">
+                    <div class="w-10 h-10 rounded-full bg-gradient-to-br from-red-900 to-black border border-red-500 shadow-sm mb-2"></div>
+                    <span class="text-xs font-bold text-red-400">มืดแดง</span>
+                </button>
+                <button onclick="setTheme('dark-purple')" class="theme-btn flex flex-col items-center p-3 rounded-2xl bg-gray-800" id="btn-theme-dark-purple">
+                    <div class="w-10 h-10 rounded-full bg-gradient-to-br from-purple-900 to-black border border-purple-500 shadow-sm mb-2"></div>
+                    <span class="text-xs font-bold text-purple-400">มืดม่วง</span>
+                </button>
+            </div>
+            
+            <div class="text-center">
+                <p class="text-[10px] text-gray-400">การตั้งค่าจะถูกบันทึกไว้ในอุปกรณ์นี้</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Door Overlay -->
     <div id="door-overlay">
         <div class="door-panel door-left"></div>
         <div class="door-panel door-right"></div>
@@ -218,13 +327,14 @@
                 <div></div><div></div><div></div><div></div><div></div><div></div>
                 <div></div><div></div><div></div><div></div><div></div><div></div>
             </div>
-            <div class="mt-4 text-gray-500 text-sm font-medium tracking-wide">กำลังโหลด...</div>
+            <div class="mt-4 text-sm font-medium tracking-wide" style="color: var(--text-sub);">กำลังเดินทาง...</div>
         </div>
     </div>
 
     <!-- Navbar -->
-    <nav class="glass-nav sticky top-0 z-50 transition-all duration-300">
+    <nav class="glass-nav fixed top-0 w-full z-50 transition-all duration-300">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <!-- Top Row -->
             <div class="flex justify-between items-center h-16 md:h-20">
                 <!-- Logo -->
                 <div class="flex items-center space-x-3 cursor-pointer" onclick="showSection('home')">
@@ -232,54 +342,51 @@
                         <i class="fas fa-graduation-cap text-lg"></i>
                     </div>
                     <div>
-                        <span class="text-lg font-bold text-gray-900 tracking-tight">ClassHub</span>
+                        <span class="text-lg font-bold text-gray-900 tracking-tight" style="color: var(--text-main);">ClassHub</span>
                         <span class="text-[10px] block text-gray-500 font-medium tracking-wide uppercase">ม.5/6</span>
                     </div>
                 </div>
 
-                <!-- Desktop Menu with Sliding Marker -->
-                <div class="hidden md:flex items-center relative bg-gray-100/50 rounded-full p-1 border border-gray-200/50 backdrop-blur-sm">
-                    <div id="nav-marker"></div> <!-- Sliding Background -->
-                    <a href="javascript:void(0)" onclick="showSection('home')" class="nav-link px-6 py-1.5 rounded-full" id="link-home">หน้าหลัก</a>
-                    <a href="javascript:void(0)" onclick="showSection('schedule')" class="nav-link px-6 py-1.5 rounded-full" id="link-schedule">ตารางเรียน</a>
-                    <a href="javascript:void(0)" onclick="showSection('calendar')" class="nav-link px-6 py-1.5 rounded-full" id="link-calendar">ปฏิทิน</a>
-                    <a href="javascript:void(0)" onclick="showSection('students')" class="nav-link px-6 py-1.5 rounded-full" id="link-students">รายชื่อเพื่อน</a>
+                <!-- Desktop Menu -->
+                <div class="hidden md:flex items-center space-x-4">
+                    <div class="relative rounded-full p-1 border backdrop-blur-sm flex items-center" style="background-color: rgba(255,255,255,0.1); border-color: var(--glass-border);">
+                        <div id="nav-marker" class="absolute top-1 bottom-1 left-0 rounded-full"></div>
+                        <a href="javascript:void(0)" onclick="showSection('home')" class="nav-link px-6 py-1.5 rounded-full" id="link-home">หน้าหลัก</a>
+                        <a href="javascript:void(0)" onclick="showSection('schedule')" class="nav-link px-6 py-1.5 rounded-full" id="link-schedule">ตารางเรียน</a>
+                        <a href="javascript:void(0)" onclick="showSection('calendar')" class="nav-link px-6 py-1.5 rounded-full" id="link-calendar">ปฏิทิน</a>
+                        <a href="javascript:void(0)" onclick="showSection('students')" class="nav-link px-6 py-1.5 rounded-full" id="link-students">รายชื่อเพื่อน</a>
+                    </div>
+                    
+                    <button onclick="toggleSettings()" class="w-10 h-10 rounded-full flex items-center justify-center hover:bg-gray-200/50 transition-colors" style="color: var(--text-main);">
+                        <i class="fas fa-cog text-xl"></i>
+                    </button>
                 </div>
-
-                <!-- Mobile Menu Button -->
+                
+                <!-- Settings Button (Mobile) -->
                 <div class="md:hidden">
-                    <button onclick="toggleMobileMenu()" class="p-2 rounded-full bg-gray-100/80 text-gray-600 hover:bg-gray-200 focus:outline-none transition-colors">
-                        <i class="fas fa-bars text-lg"></i>
+                    <button onclick="toggleSettings()" class="w-10 h-10 rounded-full flex items-center justify-center" style="background-color: rgba(255,255,255,0.2); color: var(--text-main);">
+                        <i class="fas fa-cog text-lg"></i>
                     </button>
                 </div>
             </div>
-        </div>
 
-        <!-- Mobile Menu Dropdown -->
-        <div id="mobile-menu" class="hidden md:hidden glass-nav border-t border-gray-100 absolute w-full left-0 shadow-xl origin-top animate-[fadeIn_0.2s_ease-out]">
-            <div class="px-4 pt-4 pb-6 space-y-2">
-                <a href="javascript:void(0)" onclick="showSection('home'); toggleMobileMenu()" class="flex items-center space-x-3 p-3 rounded-2xl bg-white/50 hover:bg-white text-gray-700 hover:text-blue-600 transition-all border border-transparent hover:border-gray-100 hover:shadow-sm">
-                    <div class="w-8 h-8 rounded-xl bg-blue-100 flex items-center justify-center text-blue-600"><i class="fas fa-home text-xs"></i></div>
-                    <span class="font-medium">หน้าหลัก</span>
-                </a>
-                <a href="javascript:void(0)" onclick="showSection('schedule'); toggleMobileMenu()" class="flex items-center space-x-3 p-3 rounded-2xl bg-white/50 hover:bg-white text-gray-700 hover:text-blue-600 transition-all border border-transparent hover:border-gray-100 hover:shadow-sm">
-                    <div class="w-8 h-8 rounded-xl bg-pink-100 flex items-center justify-center text-pink-600"><i class="fas fa-calendar-alt text-xs"></i></div>
-                    <span class="font-medium">ตารางเรียน</span>
-                </a>
-                <a href="javascript:void(0)" onclick="showSection('calendar'); toggleMobileMenu()" class="flex items-center space-x-3 p-3 rounded-2xl bg-white/50 hover:bg-white text-gray-700 hover:text-blue-600 transition-all border border-transparent hover:border-gray-100 hover:shadow-sm">
-                    <div class="w-8 h-8 rounded-xl bg-orange-100 flex items-center justify-center text-orange-600"><i class="fas fa-calendar-check text-xs"></i></div>
-                    <span class="font-medium">ปฏิทินกิจกรรม</span>
-                </a>
-                <a href="javascript:void(0)" onclick="showSection('students'); toggleMobileMenu()" class="flex items-center space-x-3 p-3 rounded-2xl bg-white/50 hover:bg-white text-gray-700 hover:text-blue-600 transition-all border border-transparent hover:border-gray-100 hover:shadow-sm">
-                    <div class="w-8 h-8 rounded-xl bg-green-100 flex items-center justify-center text-green-600"><i class="fas fa-users text-xs"></i></div>
-                    <span class="font-medium">รายชื่อนักเรียน</span>
-                </a>
+            <!-- Mobile Menu Row -->
+            <div class="md:hidden pb-3">
+                <div class="relative rounded-xl p-1 border overflow-hidden" style="background-color: rgba(255,255,255,0.1); border-color: var(--glass-border);">
+                    <div class="flex items-center overflow-x-auto scrollbar-hide relative space-x-1">
+                        <div id="mobile-nav-marker" class="absolute top-0 bottom-0 left-0 rounded-lg pointer-events-none"></div> 
+                        <a href="javascript:void(0)" onclick="showSection('home')" class="mobile-nav-link flex-1 text-center py-2 px-3 rounded-lg text-xs" id="mobile-link-home"><i class="fas fa-home mb-1 block text-sm"></i> หน้าหลัก</a>
+                        <a href="javascript:void(0)" onclick="showSection('schedule')" class="mobile-nav-link flex-1 text-center py-2 px-3 rounded-lg text-xs" id="mobile-link-schedule"><i class="fas fa-calendar-alt mb-1 block text-sm"></i> ตารางเรียน</a>
+                        <a href="javascript:void(0)" onclick="showSection('calendar')" class="mobile-nav-link flex-1 text-center py-2 px-3 rounded-lg text-xs" id="mobile-link-calendar"><i class="fas fa-calendar-check mb-1 block text-sm"></i> ปฏิทิน</a>
+                        <a href="javascript:void(0)" onclick="showSection('students')" class="mobile-nav-link flex-1 text-center py-2 px-3 rounded-lg text-xs" id="mobile-link-students"><i class="fas fa-users mb-1 block text-sm"></i> รายชื่อ</a>
+                    </div>
+                </div>
             </div>
         </div>
     </nav>
 
     <!-- Main Content -->
-    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 md:py-10 min-h-[85vh]">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 md:py-10 min-h-[85vh]">
         
         <!-- SECTION: HOME -->
         <div id="section-home" class="tab-content">
@@ -287,30 +394,22 @@
                 
                 <!-- Welcome Banner -->
                 <div class="lg:col-span-8 space-y-6 md:space-y-8">
-                    <div class="relative overflow-hidden rounded-[32px] bg-white p-8 md:p-12 shadow-2xl shadow-blue-100 border border-white/50">
+                    <div class="relative overflow-hidden rounded-[32px] p-8 md:p-12 shadow-2xl glass-card">
                         <!-- Abstract Background -->
-                        <div class="absolute top-0 right-0 w-full h-full bg-gradient-to-br from-blue-50 via-white to-purple-50 opacity-80"></div>
-                        <div class="absolute top-[-50px] right-[-50px] w-64 h-64 rounded-full bg-gradient-to-br from-blue-400 to-indigo-500 blur-3xl opacity-20"></div>
-                        
+                        <div class="absolute top-0 right-0 w-full h-full bg-gradient-to-br from-blue-50 via-white to-purple-50 opacity-80 mix-blend-overlay"></div>
                         <div class="relative z-10">
-                            <span class="inline-block py-1.5 px-4 rounded-full bg-white/60 backdrop-blur-md text-xs font-bold text-gray-500 mb-4 border border-white shadow-sm">ภาคเรียนที่ 2 / 2568</span>
-                            <h1 class="text-3xl md:text-5xl font-extrabold mb-4 text-gray-900 tracking-tight leading-tight">ClassHub <span class="text-transparent bg-clip-text bg-gradient-to-r from-blue-600 to-indigo-600">ม.5/6</span></h1>
-                            <p class="text-gray-500 text-lg md:text-xl max-w-xl">ศูนย์กลางข้อมูลข่าวสาร ตารางเรียน และปฏิทินกิจกรรมโรงเรียนขุขันธ์</p>
+                            <span class="inline-block py-1.5 px-4 rounded-full bg-white/60 backdrop-blur-md text-xs font-bold mb-4 border border-white shadow-sm" style="color: var(--text-sub);">ภาคเรียนที่ 2 / 2568</span>
+                            <h1 class="text-3xl md:text-5xl font-extrabold mb-4 tracking-tight leading-tight" style="color: var(--text-main);">ClassHub <span class="text-transparent bg-clip-text bg-gradient-to-r from-blue-600 to-indigo-600">ม.5/6</span></h1>
+                            <p class="text-lg md:text-xl max-w-xl" style="color: var(--text-sub);">ศูนย์กลางข้อมูลข่าวสาร ตารางเรียน และปฏิทินกิจกรรมโรงเรียนขุขันธ์</p>
                             
                             <div class="mt-8 flex flex-wrap gap-4">
                                 <div class="bg-white/60 backdrop-blur-xl rounded-2xl p-4 flex items-center border border-white shadow-sm min-w-[160px]">
                                     <div class="w-10 h-10 rounded-full bg-orange-100 flex items-center justify-center mr-3 text-orange-500 text-xl"><i class="fas fa-calendar-day"></i></div>
-                                    <div>
-                                        <p class="text-[10px] text-gray-400 font-bold uppercase tracking-wider">กิจกรรมถัดไป</p>
-                                        <p class="font-bold text-sm text-gray-800">สอบปลายภาค 2 มี.ค.</p>
-                                    </div>
+                                    <div><p class="text-[10px] font-bold uppercase tracking-wider" style="color: var(--text-sub);">กิจกรรมถัดไป</p><p class="font-bold text-sm text-gray-800">สอบปลายภาค 2 มี.ค.</p></div>
                                 </div>
                                 <div class="bg-white/60 backdrop-blur-xl rounded-2xl p-4 flex items-center border border-white shadow-sm min-w-[160px]">
                                     <div class="w-10 h-10 rounded-full bg-green-100 flex items-center justify-center mr-3 text-green-500 text-xl"><i class="fas fa-check-circle"></i></div>
-                                    <div>
-                                        <p class="text-[10px] text-gray-400 font-bold uppercase tracking-wider">สถานะวันนี้</p>
-                                        <p class="font-bold text-sm text-gray-800">เปิดเรียนปกติ</p>
-                                    </div>
+                                    <div><p class="text-[10px] font-bold uppercase tracking-wider" style="color: var(--text-sub);">สถานะวันนี้</p><p class="font-bold text-sm text-gray-800">เปิดเรียนปกติ</p></div>
                                 </div>
                             </div>
                         </div>
@@ -319,61 +418,34 @@
                     <!-- Quick Access Grid -->
                     <div>
                         <div class="flex justify-between items-end mb-6 px-2">
-                            <div>
-                                <h2 class="text-2xl font-bold text-gray-900">เมนูลัด</h2>
-                                <p class="text-sm text-gray-500">เข้าถึงบริการต่างๆ ได้อย่างรวดเร็ว</p>
-                            </div>
-                            <a href="javascript:void(0)" onclick="transitionToPage('https://sites.google.com/site/kksvichakarn/')" class="text-blue-500 hover:text-blue-700 text-sm font-semibold transition-colors bg-blue-50 px-3 py-1 rounded-full">เว็บไซต์หลัก <i class="fas fa-chevron-right text-xs ml-1"></i></a>
+                            <div><h2 class="text-2xl font-bold" style="color: var(--text-main);">เมนูลัด</h2><p class="text-sm" style="color: var(--text-sub);">เข้าถึงบริการต่างๆ ได้อย่างรวดเร็ว</p></div>
+                            <a href="javascript:void(0)" onclick="transitionToPage('https://sites.google.com/site/kksvichakarn/')" class="text-sm font-semibold transition-colors px-3 py-1 rounded-full" style="background: rgba(59,130,246,0.1); color: var(--accent-color);">เว็บไซต์หลัก <i class="fas fa-chevron-right text-xs ml-1"></i></a>
                         </div>
-                        
                         <div class="grid grid-cols-2 md:grid-cols-3 gap-4 md:gap-6">
-                            <!-- Card Items with Transition -->
+                            <!-- Items -->
                             <div onclick="transitionToPage('http://122.154.155.10/regs/')" class="group glass-card rounded-3xl p-6 hover-lift flex flex-col items-center text-center cursor-pointer">
-                                <div class="w-14 h-14 rounded-full bg-orange-100 text-orange-500 flex items-center justify-center text-2xl mb-4 group-hover:scale-110 transition-transform duration-300">
-                                    <i class="fas fa-user-edit"></i>
-                                </div>
-                                <h3 class="font-bold text-gray-800">ลงทะเบียนเรียน</h3>
-                                <p class="text-xs text-gray-400 mt-1 font-medium">ระบบงานทะเบียน</p>
+                                <div class="w-14 h-14 rounded-full bg-orange-100 text-orange-500 flex items-center justify-center text-2xl mb-4 group-hover:scale-110 transition-transform duration-300"><i class="fas fa-user-edit"></i></div>
+                                <h3 class="font-bold text-gray-800">ลงทะเบียนเรียน</h3><p class="text-xs text-gray-400 mt-1 font-medium">ระบบงานทะเบียน</p>
                             </div>
-
                             <div onclick="transitionToPage('https://sgs.bopp-obec.info/')" class="group glass-card rounded-3xl p-6 hover-lift flex flex-col items-center text-center cursor-pointer">
-                                <div class="w-14 h-14 rounded-full bg-blue-100 text-blue-500 flex items-center justify-center text-2xl mb-4 group-hover:scale-110 transition-transform duration-300">
-                                    <i class="fas fa-chart-pie"></i>
-                                </div>
-                                <h3 class="font-bold text-gray-800">ตรวจสอบเกรด</h3>
-                                <p class="text-xs text-gray-400 mt-1 font-medium">ระบบ SGS</p>
+                                <div class="w-14 h-14 rounded-full bg-blue-100 text-blue-500 flex items-center justify-center text-2xl mb-4 group-hover:scale-110 transition-transform duration-300"><i class="fas fa-chart-pie"></i></div>
+                                <h3 class="font-bold text-gray-800">ตรวจสอบเกรด</h3><p class="text-xs text-gray-400 mt-1 font-medium">ระบบ SGS</p>
                             </div>
-
                             <div onclick="transitionToPage('https://sites.google.com/site/kksvichakarn/')" class="group glass-card rounded-3xl p-6 hover-lift flex flex-col items-center text-center cursor-pointer">
-                                <div class="w-14 h-14 rounded-full bg-green-100 text-green-500 flex items-center justify-center text-2xl mb-4 group-hover:scale-110 transition-transform duration-300">
-                                    <i class="fas fa-globe"></i>
-                                </div>
-                                <h3 class="font-bold text-gray-800">เว็บไซต์วิชาการ</h3>
-                                <p class="text-xs text-gray-400 mt-1 font-medium">ข้อมูลข่าวสาร</p>
+                                <div class="w-14 h-14 rounded-full bg-green-100 text-green-500 flex items-center justify-center text-2xl mb-4 group-hover:scale-110 transition-transform duration-300"><i class="fas fa-globe"></i></div>
+                                <h3 class="font-bold text-gray-800">เว็บไซต์วิชาการ</h3><p class="text-xs text-gray-400 mt-1 font-medium">ข้อมูลข่าวสาร</p>
                             </div>
-
                             <div onclick="transitionToPage('https://drive.google.com/drive/folders/1CqiLiKbXor6ZEVU2I-vG6kN_LhHxAK6Q')" class="group glass-card rounded-3xl p-6 hover-lift flex flex-col items-center text-center cursor-pointer">
-                                <div class="w-14 h-14 rounded-full bg-purple-100 text-purple-500 flex items-center justify-center text-2xl mb-4 group-hover:scale-110 transition-transform duration-300">
-                                    <i class="fas fa-door-open"></i>
-                                </div>
-                                <h3 class="font-bold text-gray-800">ใช้ห้องเรียน</h3>
-                                <p class="text-xs text-gray-400 mt-1 font-medium">ตารางการใช้ห้อง</p>
+                                <div class="w-14 h-14 rounded-full bg-purple-100 text-purple-500 flex items-center justify-center text-2xl mb-4 group-hover:scale-110 transition-transform duration-300"><i class="fas fa-door-open"></i></div>
+                                <h3 class="font-bold text-gray-800">ใช้ห้องเรียน</h3><p class="text-xs text-gray-400 mt-1 font-medium">ตารางการใช้ห้อง</p>
                             </div>
-
                             <div onclick="transitionToPage('https://drive.google.com/drive/folders/0B-71egBy6VpfODJ4UDFBTlFnNzQ?resourcekey=0-gR-ZR5JKHEMlCI8Jd7bvaQ')" class="group glass-card rounded-3xl p-6 hover-lift flex flex-col items-center text-center cursor-pointer">
-                                <div class="w-14 h-14 rounded-full bg-pink-100 text-pink-500 flex items-center justify-center text-2xl mb-4 group-hover:scale-110 transition-transform duration-300">
-                                    <i class="fas fa-calendar-day"></i>
-                                </div>
-                                <h3 class="font-bold text-gray-800">ปฏิทินวิชาการ</h3>
-                                <p class="text-xs text-gray-400 mt-1 font-medium">Download PDF</p>
+                                <div class="w-14 h-14 rounded-full bg-pink-100 text-pink-500 flex items-center justify-center text-2xl mb-4 group-hover:scale-110 transition-transform duration-300"><i class="fas fa-calendar-day"></i></div>
+                                <h3 class="font-bold text-gray-800">ปฏิทินวิชาการ</h3><p class="text-xs text-gray-400 mt-1 font-medium">Download PDF</p>
                             </div>
-
                             <div onclick="transitionToPage('https://docs.google.com/spreadsheets/d/1nNglTKwKrmhzP5x5kNfkjiyls8WXDq9n/edit?gid=1719242929#gid=1719242929')" class="group glass-card rounded-3xl p-6 hover-lift flex flex-col items-center text-center cursor-pointer">
-                                <div class="w-14 h-14 rounded-full bg-gray-100 text-gray-600 flex items-center justify-center text-2xl mb-4 group-hover:scale-110 transition-transform duration-300">
-                                    <i class="fas fa-users"></i>
-                                </div>
-                                <h3 class="font-bold text-gray-800">รายชื่อเพื่อน</h3>
-                                <p class="text-xs text-gray-400 mt-1 font-medium">สมาชิกห้อง ม.5/6</p>
+                                <div class="w-14 h-14 rounded-full bg-gray-100 text-gray-600 flex items-center justify-center text-2xl mb-4 group-hover:scale-110 transition-transform duration-300"><i class="fas fa-users"></i></div>
+                                <h3 class="font-bold text-gray-800">รายชื่อเพื่อน</h3><p class="text-xs text-gray-400 mt-1 font-medium">สมาชิกห้อง ม.5/6</p>
                             </div>
                         </div>
                     </div>
@@ -381,47 +453,22 @@
 
                 <!-- Right Sidebar -->
                 <div class="lg:col-span-4 space-y-6">
-                    
-                    <!-- Mini Calendar Widget -->
-                    <div class="glass-card rounded-[32px] p-6 relative overflow-hidden group border border-white/60">
+                    <div class="glass-card rounded-[32px] p-6 relative overflow-hidden group">
                         <div class="absolute top-0 right-0 w-32 h-32 bg-red-500/5 rounded-bl-[100px] -mr-8 -mt-8 pointer-events-none"></div>
-                        <h2 class="text-lg font-bold text-gray-900 mb-4 flex items-center"><span class="w-1.5 h-6 bg-red-500 rounded-full mr-3"></span>ไฮไลท์วันนี้</h2>
-                        
-                        <div id="today-event-mini" class="bg-white/40 rounded-2xl p-4 border border-white/50 backdrop-blur-sm">
-                             <!-- JS Populated -->
-                             <div class="animate-pulse flex space-x-3">
-                                <div class="flex-1 space-y-2">
-                                    <div class="h-4 bg-gray-200 rounded w-2/3"></div>
-                                    <div class="h-3 bg-gray-200 rounded w-1/2"></div>
-                                </div>
-                             </div>
-                        </div>
-                        <button onclick="showSection('calendar')" class="mt-4 w-full py-3 rounded-2xl bg-white text-red-500 font-bold text-sm shadow-sm hover:bg-red-50 transition-colors border border-red-100">
-                            ดูปฏิทินทั้งหมด
-                        </button>
+                        <h2 class="text-lg font-bold mb-4 flex items-center" style="color: var(--text-main);"><span class="w-1.5 h-6 bg-red-500 rounded-full mr-3"></span>ไฮไลท์วันนี้</h2>
+                        <div id="today-event-mini" class="bg-white/40 rounded-2xl p-4 border border-white/50 backdrop-blur-sm"></div>
+                        <button onclick="showSection('calendar')" class="mt-4 w-full py-3 rounded-2xl bg-white text-red-500 font-bold text-sm shadow-sm hover:bg-red-50 transition-colors border border-red-100">ดูปฏิทินทั้งหมด</button>
                     </div>
-
-                    <!-- School Links -->
-                    <div class="glass-card rounded-[32px] p-6 border border-white/60">
-                        <h2 class="text-lg font-bold text-gray-900 mb-4">ติดต่อโรงเรียน</h2>
+                    <div class="glass-card rounded-[32px] p-6">
+                        <h2 class="text-lg font-bold mb-4" style="color: var(--text-main);">ติดต่อโรงเรียน</h2>
                         <div class="space-y-3">
                             <a href="javascript:void(0)" onclick="transitionToPage('http://www.khukhan.ac.th')" class="flex items-center p-3.5 rounded-2xl bg-white/70 hover:bg-white transition-all border border-gray-100 hover:shadow-md group">
-                                <div class="w-10 h-10 rounded-xl bg-blue-50 text-blue-600 flex items-center justify-center mr-3 group-hover:scale-110 transition-transform">
-                                    <i class="fas fa-university"></i>
-                                </div>
-                                <div>
-                                    <span class="font-bold text-gray-800 block text-sm">โรงเรียนขุขันธ์</span>
-                                    <span class="text-xs text-gray-400 font-medium">www.khukhan.ac.th</span>
-                                </div>
+                                <div class="w-10 h-10 rounded-xl bg-blue-50 text-blue-600 flex items-center justify-center mr-3 group-hover:scale-110 transition-transform"><i class="fas fa-university"></i></div>
+                                <div><span class="font-bold text-gray-800 block text-sm">โรงเรียนขุขันธ์</span><span class="text-xs text-gray-400 font-medium">www.khukhan.ac.th</span></div>
                             </a>
                             <a href="javascript:void(0)" onclick="transitionToPage('https://www.facebook.com/KhukhanSchool.KS')" class="flex items-center p-3.5 rounded-2xl bg-white/70 hover:bg-white transition-all border border-gray-100 hover:shadow-md group">
-                                <div class="w-10 h-10 rounded-xl bg-indigo-50 text-indigo-600 flex items-center justify-center mr-3 group-hover:scale-110 transition-transform">
-                                    <i class="fab fa-facebook-f"></i>
-                                </div>
-                                <div>
-                                    <span class="font-bold text-gray-800 block text-sm">Facebook Page</span>
-                                    <span class="text-xs text-gray-400 font-medium">ข่าวสารประชาสัมพันธ์</span>
-                                </div>
+                                <div class="w-10 h-10 rounded-xl bg-indigo-50 text-indigo-600 flex items-center justify-center mr-3 group-hover:scale-110 transition-transform"><i class="fab fa-facebook-f"></i></div>
+                                <div><span class="font-bold text-gray-800 block text-sm">Facebook Page</span><span class="text-xs text-gray-400 font-medium">ข่าวสารประชาสัมพันธ์</span></div>
                             </a>
                         </div>
                     </div>
@@ -431,49 +478,28 @@
 
         <!-- SECTION: SCHEDULE -->
         <div id="section-schedule" class="tab-content hidden">
-            <div class="glass-card rounded-[32px] overflow-hidden shadow-xl border border-white/50">
+            <div class="glass-card rounded-[32px] overflow-hidden shadow-xl">
                 <div class="p-6 md:p-8 bg-white/80 backdrop-blur-md border-b border-gray-100 flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
-                    <div>
-                        <h2 class="text-2xl font-bold text-gray-900">ตารางเรียน</h2>
-                        <p class="text-gray-500 mt-1 font-medium">ภาคเรียนที่ 2/2568 โรงเรียนขุขันธ์</p>
-                    </div>
-                    <span class="px-4 py-1.5 rounded-full bg-blue-50 text-blue-600 text-xs font-bold uppercase tracking-wider">
-                        Updated: 29 ต.ค. 68
-                    </span>
+                    <div><h2 class="text-2xl font-bold text-gray-900">ตารางเรียน</h2><p class="text-gray-500 mt-1 font-medium">ภาคเรียนที่ 2/2568 โรงเรียนขุขันธ์</p></div>
+                    <span class="px-4 py-1.5 rounded-full bg-blue-50 text-blue-600 text-xs font-bold uppercase tracking-wider">Updated: 29 ต.ค. 68</span>
                 </div>
-
                 <!-- Desktop Table View -->
                 <div class="hidden md:block overflow-x-auto bg-white/60">
                     <table class="w-full text-center border-collapse">
-                        <thead>
-                            <tr class="bg-gray-50/50 text-gray-500 text-xs uppercase tracking-wider font-semibold border-b border-gray-100">
-                                <th class="p-4 w-24">วัน</th>
-                                <th class="p-4 border-l border-gray-100">1<br><span class="opacity-50">08.40-09.30</span></th>
-                                <th class="p-4 border-l border-gray-100">2<br><span class="opacity-50">09.30-10.20</span></th>
-                                <th class="p-4 border-l border-gray-100">3<br><span class="opacity-50">10.20-11.10</span></th>
-                                <th class="p-4 border-l border-gray-100">4<br><span class="opacity-50">11.10-12.00</span></th>
-                                <th class="p-4 border-l border-gray-100 bg-gray-100/30 w-20">5<br><span class="opacity-50">12.00-12.50</span></th>
-                                <th class="p-4 border-l border-gray-100">6<br><span class="opacity-50">12.50-13.40</span></th>
-                                <th class="p-4 border-l border-gray-100">7<br><span class="opacity-50">13.40-14.30</span></th>
-                                <th class="p-4 border-l border-gray-100">8<br><span class="opacity-50">14.30-15.20</span></th>
-                                <th class="p-4 border-l border-gray-100">9<br><span class="opacity-50">15.20-16.10</span></th>
-                            </tr>
-                        </thead>
+                        <thead><tr class="bg-gray-50/50 text-gray-500 text-xs uppercase tracking-wider font-semibold border-b border-gray-100"><th class="p-4 w-24">วัน</th><th class="p-4 border-l border-gray-100">1<br>08.40</th><th class="p-4 border-l border-gray-100">2<br>09.30</th><th class="p-4 border-l border-gray-100">3<br>10.20</th><th class="p-4 border-l border-gray-100">4<br>11.10</th><th class="p-4 border-l border-gray-100 bg-gray-100/30 w-20">5<br>12.00</th><th class="p-4 border-l border-gray-100">6<br>12.50</th><th class="p-4 border-l border-gray-100">7<br>13.40</th><th class="p-4 border-l border-gray-100">8<br>14.30</th><th class="p-4 border-l border-gray-100">9<br>15.20</th></tr></thead>
                         <tbody class="text-sm font-medium">
-                            <!-- Monday -->
                             <tr class="border-b border-gray-100 hover:bg-white transition-colors">
                                 <td class="p-4 font-bold text-yellow-600 bg-yellow-50/40">จันทร์</td>
-                                <td class="p-2 border-l border-gray-100"><div class="font-bold text-gray-800">อ32102</div><div class="text-[10px] text-gray-400 uppercase">ครูสาริกา</div><span class="inline-block mt-1 px-1.5 py-0.5 bg-gray-100 text-gray-500 text-[10px] rounded-md font-bold">323</span></td>
-                                <td class="p-2 border-l border-gray-100"><div class="font-bold text-gray-800">แนะแนว</div><div class="text-[10px] text-gray-400 uppercase">ครูกัญญ์ภัสส</div><span class="inline-block mt-1 px-1.5 py-0.5 bg-gray-100 text-gray-500 text-[10px] rounded-md font-bold">123</span></td>
-                                <td class="p-2 border-l border-gray-100"><div class="font-bold text-gray-800">ค32122</div><div class="text-[10px] text-gray-400 uppercase">ครูปทิตตา</div><span class="inline-block mt-1 px-1.5 py-0.5 bg-gray-100 text-gray-500 text-[10px] rounded-md font-bold">635</span></td>
-                                <td class="p-2 border-l border-gray-100"><div class="font-bold text-gray-800">I30202</div><div class="text-[10px] text-gray-400 uppercase">ครูดิลก</div><span class="inline-block mt-1 px-1.5 py-0.5 bg-gray-100 text-gray-500 text-[10px] rounded-md font-bold">ดนตรี2</span></td>
+                                <td class="p-2 border-l border-gray-100"><div class="font-bold text-gray-800">อ32102</div><div class="text-[10px] text-gray-400">ครูสาริกา</div><span class="inline-block mt-1 px-1.5 py-0.5 bg-gray-100 text-gray-500 text-[10px] rounded-md font-bold">323</span></td>
+                                <td class="p-2 border-l border-gray-100"><div class="font-bold text-gray-800">แนะแนว</div><div class="text-[10px] text-gray-400">ครูกัญญ์ภัสส</div><span class="inline-block mt-1 px-1.5 py-0.5 bg-gray-100 text-gray-500 text-[10px] rounded-md font-bold">123</span></td>
+                                <td class="p-2 border-l border-gray-100"><div class="font-bold text-gray-800">ค32122</div><div class="text-[10px] text-gray-400">ครูปทิตตา</div><span class="inline-block mt-1 px-1.5 py-0.5 bg-gray-100 text-gray-500 text-[10px] rounded-md font-bold">635</span></td>
+                                <td class="p-2 border-l border-gray-100"><div class="font-bold text-gray-800">I30202</div><div class="text-[10px] text-gray-400">ครูดิลก</div><span class="inline-block mt-1 px-1.5 py-0.5 bg-gray-100 text-gray-500 text-[10px] rounded-md font-bold">ดนตรี2</span></td>
                                 <td class="p-2 border-l border-gray-100 bg-gray-50/50 text-gray-400 text-xs font-bold writing-vertical"><div class="py-4 rotate-90 md:rotate-0">พัก</div></td>
-                                <td class="p-2 border-l border-gray-100"><div class="font-bold text-gray-800">ว32102</div><div class="text-[10px] text-gray-400 uppercase">ครูศุภวัฒน์</div><span class="inline-block mt-1 px-1.5 py-0.5 bg-gray-100 text-gray-500 text-[10px] rounded-md font-bold">442</span></td>
-                                <td class="p-2 border-l border-gray-100"><div class="font-bold text-gray-800">ว32102</div><div class="text-[10px] text-gray-400 uppercase">ครูศุภวัฒน์</div><span class="inline-block mt-1 px-1.5 py-0.5 bg-gray-100 text-gray-500 text-[10px] rounded-md font-bold">442</span></td>
-                                <td class="p-2 border-l border-gray-100"><div class="font-bold text-gray-800">อ30204</div><div class="text-[10px] text-gray-400 uppercase">ครูJada</div><span class="inline-block mt-1 px-1.5 py-0.5 bg-gray-100 text-gray-500 text-[10px] rounded-md font-bold">324</span></td>
+                                <td class="p-2 border-l border-gray-100"><div class="font-bold text-gray-800">ว32102</div><div class="text-[10px] text-gray-400">ครูศุภวัฒน์</div><span class="inline-block mt-1 px-1.5 py-0.5 bg-gray-100 text-gray-500 text-[10px] rounded-md font-bold">442</span></td>
+                                <td class="p-2 border-l border-gray-100"><div class="font-bold text-gray-800">ว32102</div><div class="text-[10px] text-gray-400">ครูศุภวัฒน์</div><span class="inline-block mt-1 px-1.5 py-0.5 bg-gray-100 text-gray-500 text-[10px] rounded-md font-bold">442</span></td>
+                                <td class="p-2 border-l border-gray-100"><div class="font-bold text-gray-800">อ30204</div><div class="text-[10px] text-gray-400">ครูJada</div><span class="inline-block mt-1 px-1.5 py-0.5 bg-gray-100 text-gray-500 text-[10px] rounded-md font-bold">324</span></td>
                                 <td class="p-2 border-l border-gray-100"></td>
                             </tr>
-                            <!-- Other days (Content same as previous, just updated container style) -->
                             <tr class="border-b border-gray-100 hover:bg-white transition-colors">
                                 <td class="p-4 font-bold text-pink-600 bg-pink-50/40">อังคาร</td>
                                 <td class="p-2 border-l border-gray-100"><div class="font-bold text-gray-800">เลือกเสรี</div><div class="text-[10px] text-gray-400">-</div><span class="inline-block mt-1 px-1.5 py-0.5 bg-gray-100 text-gray-500 text-[10px] rounded-md font-bold">ม.5</span></td>
@@ -522,7 +548,6 @@
                         </tbody>
                     </table>
                 </div>
-
                 <!-- Mobile Schedule (Tabs Style) -->
                 <div class="md:hidden">
                     <div class="flex overflow-x-auto bg-gray-50/50 p-2 gap-2 scrollbar-hide border-b border-gray-200">
@@ -532,37 +557,52 @@
                         <button onclick="selectMobileDay('thu')" id="tab-thu" class="mobile-tab flex-shrink-0 px-5 py-2.5 rounded-full text-sm font-bold bg-white text-gray-500 border border-gray-200 transition-all">พฤหัส</button>
                         <button onclick="selectMobileDay('fri')" id="tab-fri" class="mobile-tab flex-shrink-0 px-5 py-2.5 rounded-full text-sm font-bold bg-white text-gray-500 border border-gray-200 transition-all">ศุกร์</button>
                     </div>
-
                     <div class="p-4 bg-gray-50/30 min-h-[300px]">
                         <!-- Content for Monday -->
                         <div id="mobile-mon" class="mobile-day-content space-y-3">
-                             <div class="bg-white p-4 rounded-3xl shadow-sm border border-gray-100 flex justify-between items-center">
-                                <div><p class="text-[10px] font-bold text-gray-400 uppercase tracking-wide">08.40 - 09.30</p><p class="font-bold text-gray-800 text-lg">อ32102</p><p class="text-xs text-gray-500">ครูสาริกา</p></div>
-                                <div class="bg-yellow-50 text-yellow-600 px-3 py-1.5 rounded-xl text-xs font-bold shadow-sm">323</div>
-                             </div>
-                             <div class="bg-white p-4 rounded-3xl shadow-sm border border-gray-100 flex justify-between items-center">
-                                <div><p class="text-[10px] font-bold text-gray-400 uppercase tracking-wide">09.30 - 10.20</p><p class="font-bold text-gray-800 text-lg">แนะแนว</p><p class="text-xs text-gray-500">ครูกัญญ์ภัสส</p></div>
-                                <div class="bg-yellow-50 text-yellow-600 px-3 py-1.5 rounded-xl text-xs font-bold shadow-sm">123</div>
-                             </div>
-                             <div class="bg-white p-4 rounded-3xl shadow-sm border border-gray-100 flex justify-between items-center"><div><p class="text-[10px] font-bold text-gray-400 uppercase tracking-wide">10.20 - 11.10</p><p class="font-bold text-gray-800 text-lg">ค32122</p><p class="text-xs text-gray-500">ครูปทิตตา</p></div><div class="bg-yellow-50 text-yellow-600 px-3 py-1.5 rounded-xl text-xs font-bold shadow-sm">635</div></div>
-                             <div class="bg-white p-4 rounded-3xl shadow-sm border border-gray-100 flex justify-between items-center"><div><p class="text-[10px] font-bold text-gray-400 uppercase tracking-wide">11.10 - 12.00</p><p class="font-bold text-gray-800 text-lg">I30202</p><p class="text-xs text-gray-500">ครูดิลก</p></div><div class="bg-yellow-50 text-yellow-600 px-3 py-1.5 rounded-xl text-xs font-bold shadow-sm">ดนตรี2</div></div>
+                             <div class="bg-white p-4 rounded-3xl shadow-sm border border-gray-100 flex justify-between items-center"><div><p class="text-[10px] font-bold text-gray-400 uppercase">08.40</p><p class="font-bold text-gray-800 text-lg">อ32102</p><p class="text-xs text-gray-500">ครูสาริกา</p></div><div class="bg-yellow-50 text-yellow-600 px-3 py-1.5 rounded-xl text-xs font-bold">323</div></div>
+                             <div class="bg-white p-4 rounded-3xl shadow-sm border border-gray-100 flex justify-between items-center"><div><p class="text-[10px] font-bold text-gray-400 uppercase">09.30</p><p class="font-bold text-gray-800 text-lg">แนะแนว</p><p class="text-xs text-gray-500">ครูกัญญ์ภัสส</p></div><div class="bg-yellow-50 text-yellow-600 px-3 py-1.5 rounded-xl text-xs font-bold">123</div></div>
+                             <div class="bg-white p-4 rounded-3xl shadow-sm border border-gray-100 flex justify-between items-center"><div><p class="text-[10px] font-bold text-gray-400 uppercase">10.20</p><p class="font-bold text-gray-800 text-lg">ค32122</p><p class="text-xs text-gray-500">ครูปทิตตา</p></div><div class="bg-yellow-50 text-yellow-600 px-3 py-1.5 rounded-xl text-xs font-bold">635</div></div>
+                             <div class="bg-white p-4 rounded-3xl shadow-sm border border-gray-100 flex justify-between items-center"><div><p class="text-[10px] font-bold text-gray-400 uppercase">11.10</p><p class="font-bold text-gray-800 text-lg">I30202</p><p class="text-xs text-gray-500">ครูดิลก</p></div><div class="bg-yellow-50 text-yellow-600 px-3 py-1.5 rounded-xl text-xs font-bold">ดนตรี2</div></div>
                              <div class="bg-gray-100 p-2.5 rounded-2xl text-center text-xs font-bold text-gray-400 uppercase tracking-wide">พักกลางวัน</div>
-                             <div class="bg-white p-4 rounded-3xl shadow-sm border border-gray-100 flex justify-between items-center"><div><p class="text-[10px] font-bold text-gray-400 uppercase tracking-wide">12.50 - 14.30</p><p class="font-bold text-gray-800 text-lg">ว32102 (2คาบ)</p><p class="text-xs text-gray-500">ครูศุภวัฒน์</p></div><div class="bg-yellow-50 text-yellow-600 px-3 py-1.5 rounded-xl text-xs font-bold shadow-sm">442</div></div>
-                             <div class="bg-white p-4 rounded-3xl shadow-sm border border-gray-100 flex justify-between items-center"><div><p class="text-[10px] font-bold text-gray-400 uppercase tracking-wide">14.30 - 15.20</p><p class="font-bold text-gray-800 text-lg">อ30204</p><p class="text-xs text-gray-500">ครูJada</p></div><div class="bg-yellow-50 text-yellow-600 px-3 py-1.5 rounded-xl text-xs font-bold shadow-sm">324</div></div>
+                             <div class="bg-white p-4 rounded-3xl shadow-sm border border-gray-100 flex justify-between items-center"><div><p class="text-[10px] font-bold text-gray-400 uppercase">12.50</p><p class="font-bold text-gray-800 text-lg">ว32102</p><p class="text-xs text-gray-500">ครูศุภวัฒน์</p></div><div class="bg-yellow-50 text-yellow-600 px-3 py-1.5 rounded-xl text-xs font-bold">442</div></div>
+                             <div class="bg-white p-4 rounded-3xl shadow-sm border border-gray-100 flex justify-between items-center"><div><p class="text-[10px] font-bold text-gray-400 uppercase">14.30</p><p class="font-bold text-gray-800 text-lg">อ30204</p><p class="text-xs text-gray-500">ครูJada</p></div><div class="bg-yellow-50 text-yellow-600 px-3 py-1.5 rounded-xl text-xs font-bold">324</div></div>
                         </div>
-                        
-                        <!-- Placeholders for other days (Hidden) - JS will toggle -->
                         <div id="mobile-tue" class="mobile-day-content space-y-3 hidden">
-                            <div class="text-center py-10 text-gray-400">โหลดข้อมูลวันอังคาร...</div>
+                             <div class="bg-white p-4 rounded-3xl shadow-sm border border-gray-100 flex justify-between items-center"><div><p class="text-[10px] font-bold text-gray-400 uppercase">08.40</p><p class="font-bold text-gray-800 text-lg">เลือกเสรี</p><p class="text-xs text-gray-500">-</p></div><div class="bg-pink-50 text-pink-600 px-3 py-1.5 rounded-xl text-xs font-bold">ม.5</div></div>
+                             <div class="bg-white p-4 rounded-3xl shadow-sm border border-gray-100 flex justify-between items-center"><div><p class="text-[10px] font-bold text-gray-400 uppercase">10.20</p><p class="font-bold text-gray-800 text-lg">ค32226</p><p class="text-xs text-gray-500">ครูนงนุช</p></div><div class="bg-pink-50 text-pink-600 px-3 py-1.5 rounded-xl text-xs font-bold">634</div></div>
+                             <div class="bg-white p-4 rounded-3xl shadow-sm border border-gray-100 flex justify-between items-center"><div><p class="text-[10px] font-bold text-gray-400 uppercase">11.10</p><p class="font-bold text-gray-800 text-lg">ส32103</p><p class="text-xs text-gray-500">ครูวาสินีย์</p></div><div class="bg-pink-50 text-pink-600 px-3 py-1.5 rounded-xl text-xs font-bold">547</div></div>
+                             <div class="bg-gray-100 p-2.5 rounded-2xl text-center text-xs font-bold text-gray-400 uppercase tracking-wide">พักกลางวัน</div>
+                             <div class="bg-white p-4 rounded-3xl shadow-sm border border-gray-100 flex justify-between items-center"><div><p class="text-[10px] font-bold text-gray-400 uppercase">12.50</p><p class="font-bold text-gray-800 text-lg">ท32102</p><p class="text-xs text-gray-500">ครูทวีศิลป์</p></div><div class="bg-pink-50 text-pink-600 px-3 py-1.5 rounded-xl text-xs font-bold">114</div></div>
+                             <div class="bg-white p-4 rounded-3xl shadow-sm border border-gray-100 flex justify-between items-center"><div><p class="text-[10px] font-bold text-gray-400 uppercase">13.40</p><p class="font-bold text-gray-800 text-lg">พ32102</p><p class="text-xs text-gray-500">ครูบุญช่วย</p></div><div class="bg-pink-50 text-pink-600 px-3 py-1.5 rounded-xl text-xs font-bold">113</div></div>
+                             <div class="bg-white p-4 rounded-3xl shadow-sm border border-gray-100 flex justify-between items-center"><div><p class="text-[10px] font-bold text-gray-400 uppercase">14.30</p><p class="font-bold text-gray-800 text-lg">อ32102</p><p class="text-xs text-gray-500">ครูสาริกา</p></div><div class="bg-pink-50 text-pink-600 px-3 py-1.5 rounded-xl text-xs font-bold">323</div></div>
                         </div>
                         <div id="mobile-wed" class="mobile-day-content space-y-3 hidden">
-                            <div class="text-center py-10 text-gray-400">โหลดข้อมูลวันพุธ...</div>
+                             <div class="bg-white p-4 rounded-3xl shadow-sm border border-gray-100 flex justify-between items-center"><div><p class="text-[10px] font-bold text-gray-400 uppercase">08.40</p><p class="font-bold text-gray-800 text-lg">I30202</p><p class="text-xs text-gray-500">ครูดิลก</p></div><div class="bg-green-50 text-green-600 px-3 py-1.5 rounded-xl text-xs font-bold">ดนตรี2</div></div>
+                             <div class="bg-white p-4 rounded-3xl shadow-sm border border-gray-100 flex justify-between items-center"><div><p class="text-[10px] font-bold text-gray-400 uppercase">09.30</p><p class="font-bold text-gray-800 text-lg">ค32122</p><p class="text-xs text-gray-500">ครูปทิตตา</p></div><div class="bg-green-50 text-green-600 px-3 py-1.5 rounded-xl text-xs font-bold">635</div></div>
+                             <div class="bg-white p-4 rounded-3xl shadow-sm border border-gray-100 flex justify-between items-center"><div><p class="text-[10px] font-bold text-gray-400 uppercase">10.20</p><p class="font-bold text-gray-800 text-lg">ส32103</p><p class="text-xs text-gray-500">ครูวาสินีย์</p></div><div class="bg-green-50 text-green-600 px-3 py-1.5 rounded-xl text-xs font-bold">547</div></div>
+                             <div class="bg-white p-4 rounded-3xl shadow-sm border border-gray-100 flex justify-between items-center"><div><p class="text-[10px] font-bold text-gray-400 uppercase">11.10</p><p class="font-bold text-gray-800 text-lg">ท32102</p><p class="text-xs text-gray-500">ครูทวีศิลป์</p></div><div class="bg-green-50 text-green-600 px-3 py-1.5 rounded-xl text-xs font-bold">114</div></div>
+                             <div class="bg-gray-100 p-2.5 rounded-2xl text-center text-xs font-bold text-gray-400 uppercase tracking-wide">พักกลางวัน</div>
+                             <div class="bg-white p-4 rounded-3xl shadow-sm border border-gray-100 flex justify-between items-center"><div><p class="text-[10px] font-bold text-gray-400 uppercase">12.50</p><p class="font-bold text-gray-800 text-lg">ว32288</p><p class="text-xs text-gray-500">ครูนัฐกร</p></div><div class="bg-green-50 text-green-600 px-3 py-1.5 rounded-xl text-xs font-bold">512</div></div>
+                             <div class="bg-white p-4 rounded-3xl shadow-sm border border-gray-100 flex justify-between items-center"><div><p class="text-[10px] font-bold text-gray-400 uppercase">14.30</p><p class="font-bold text-gray-800 text-lg">กิจกรรม</p><p class="text-xs text-gray-500">พัฒนาผู้เรียน</p></div><div class="bg-green-50 text-green-600 px-3 py-1.5 rounded-xl text-xs font-bold">-</div></div>
                         </div>
                         <div id="mobile-thu" class="mobile-day-content space-y-3 hidden">
-                            <div class="text-center py-10 text-gray-400">โหลดข้อมูลวันพฤหัสบดี...</div>
+                             <div class="bg-white p-4 rounded-3xl shadow-sm border border-gray-100 flex justify-between items-center"><div><p class="text-[10px] font-bold text-gray-400 uppercase">08.40</p><p class="font-bold text-gray-800 text-lg">ค32227</p><p class="text-xs text-gray-500">ครูสร้อยดาว</p></div><div class="bg-orange-50 text-orange-600 px-3 py-1.5 rounded-xl text-xs font-bold">634</div></div>
+                             <div class="bg-white p-4 rounded-3xl shadow-sm border border-gray-100 flex justify-between items-center"><div><p class="text-[10px] font-bold text-gray-400 uppercase">09.30</p><p class="font-bold text-gray-800 text-lg">ค32226</p><p class="text-xs text-gray-500">ครูนงนุช</p></div><div class="bg-orange-50 text-orange-600 px-3 py-1.5 rounded-xl text-xs font-bold">634</div></div>
+                             <div class="bg-white p-4 rounded-3xl shadow-sm border border-gray-100 flex justify-between items-center"><div><p class="text-[10px] font-bold text-gray-400 uppercase">10.20</p><p class="font-bold text-gray-800 text-lg">ส32104</p><p class="text-xs text-gray-500">ครูชนกานต์</p></div><div class="bg-orange-50 text-orange-600 px-3 py-1.5 rounded-xl text-xs font-bold">544</div></div>
+                             <div class="bg-gray-100 p-2.5 rounded-2xl text-center text-xs font-bold text-gray-400 uppercase tracking-wide">พักกลางวัน</div>
+                             <div class="bg-white p-4 rounded-3xl shadow-sm border border-gray-100 flex justify-between items-center"><div><p class="text-[10px] font-bold text-gray-400 uppercase">12.50</p><p class="font-bold text-gray-800 text-lg">ศ32102</p><p class="text-xs text-gray-500">ครูชนัญชิดา</p></div><div class="bg-orange-50 text-orange-600 px-3 py-1.5 rounded-xl text-xs font-bold">นาฏ2</div></div>
+                             <div class="bg-white p-4 rounded-3xl shadow-sm border border-gray-100 flex justify-between items-center"><div><p class="text-[10px] font-bold text-gray-400 uppercase">13.40</p><p class="font-bold text-gray-800 text-lg">ง32102</p><p class="text-xs text-gray-500">ครูอินธุกาญ</p></div><div class="bg-orange-50 text-orange-600 px-3 py-1.5 rounded-xl text-xs font-bold">คก2</div></div>
+                             <div class="bg-white p-4 rounded-3xl shadow-sm border border-gray-100 flex justify-between items-center"><div><p class="text-[10px] font-bold text-gray-400 uppercase">15.20</p><p class="font-bold text-gray-800 text-lg">กิจกรรม</p><p class="text-xs text-gray-500">ชุมนุม</p></div><div class="bg-orange-50 text-orange-600 px-3 py-1.5 rounded-xl text-xs font-bold">-</div></div>
                         </div>
                         <div id="mobile-fri" class="mobile-day-content space-y-3 hidden">
-                            <div class="text-center py-10 text-gray-400">โหลดข้อมูลวันศุกร์...</div>
+                             <div class="bg-white p-4 rounded-3xl shadow-sm border border-gray-100 flex justify-between items-center"><div><p class="text-[10px] font-bold text-gray-400 uppercase">08.40</p><p class="font-bold text-gray-800 text-lg">เลือกเสรี</p><p class="text-xs text-gray-500">-</p></div><div class="bg-blue-50 text-blue-600 px-3 py-1.5 rounded-xl text-xs font-bold">ม.5</div></div>
+                             <div class="bg-white p-4 rounded-3xl shadow-sm border border-gray-100 flex justify-between items-center"><div><p class="text-[10px] font-bold text-gray-400 uppercase">10.20</p><p class="font-bold text-gray-800 text-lg">ว30205</p><p class="text-xs text-gray-500">ครูปิยธิดา</p></div><div class="bg-blue-50 text-blue-600 px-3 py-1.5 rounded-xl text-xs font-bold">431</div></div>
+                             <div class="bg-gray-100 p-2.5 rounded-2xl text-center text-xs font-bold text-gray-400 uppercase tracking-wide">พักกลางวัน</div>
+                             <div class="bg-white p-4 rounded-3xl shadow-sm border border-gray-100 flex justify-between items-center"><div><p class="text-[10px] font-bold text-gray-400 uppercase">12.50</p><p class="font-bold text-gray-800 text-lg">ค32227</p><p class="text-xs text-gray-500">ครูสร้อยดาว</p></div><div class="bg-blue-50 text-blue-600 px-3 py-1.5 rounded-xl text-xs font-bold">636</div></div>
+                             <div class="bg-white p-4 rounded-3xl shadow-sm border border-gray-100 flex justify-between items-center"><div><p class="text-[10px] font-bold text-gray-400 uppercase">13.40</p><p class="font-bold text-gray-800 text-lg">ส30224</p><p class="text-xs text-gray-500">ครูนัฐกร</p></div><div class="bg-blue-50 text-blue-600 px-3 py-1.5 rounded-xl text-xs font-bold">512</div></div>
+                             <div class="bg-white p-4 rounded-3xl shadow-sm border border-gray-100 flex justify-between items-center"><div><p class="text-[10px] font-bold text-gray-400 uppercase">14.30</p><p class="font-bold text-gray-800 text-lg">รร.คุณธรรม</p></div><div class="bg-blue-50 text-blue-600 px-3 py-1.5 rounded-xl text-xs font-bold">-</div></div>
+                             <div class="bg-white p-4 rounded-3xl shadow-sm border border-gray-100 flex justify-between items-center"><div><p class="text-[10px] font-bold text-gray-400 uppercase">15.20</p><p class="font-bold text-gray-800 text-lg">โฮมรูม</p></div><div class="bg-blue-50 text-blue-600 px-3 py-1.5 rounded-xl text-xs font-bold">-</div></div>
                         </div>
                     </div>
                 </div>
@@ -576,23 +616,15 @@
                 <div class="lg:col-span-8">
                     <div class="glass-card rounded-[32px] p-6 md:p-8 border border-white/60">
                         <div class="flex items-center mb-8">
-                            <div class="w-12 h-12 rounded-2xl bg-gradient-to-br from-pink-500 to-rose-500 text-white flex items-center justify-center text-xl shadow-lg shadow-pink-200 mr-4">
-                                <i class="fas fa-calendar-alt"></i>
-                            </div>
-                            <div>
-                                <h2 class="text-2xl font-bold text-gray-900">ปฏิทินวิชาการ</h2>
-                                <p class="text-gray-500 font-medium">กุมภาพันธ์ - มีนาคม 2569</p>
-                            </div>
+                            <div class="w-12 h-12 rounded-2xl bg-gradient-to-br from-pink-500 to-rose-500 text-white flex items-center justify-center text-xl shadow-lg mr-4"><i class="fas fa-calendar-alt"></i></div>
+                            <div><h2 class="text-2xl font-bold text-gray-900">ปฏิทินวิชาการ</h2><p class="text-gray-500 font-medium">กุมภาพันธ์ - มีนาคม 2569</p></div>
                         </div>
 
                         <!-- Date Header -->
                         <div class="bg-gradient-to-r from-orange-50 to-orange-100/50 rounded-2xl p-5 mb-8 flex items-center justify-between border border-orange-100">
                              <div class="flex items-center">
                                  <span class="w-1.5 h-10 bg-orange-400 rounded-full mr-4 shadow-sm"></span>
-                                 <div>
-                                     <p class="text-[10px] font-bold text-orange-400 uppercase tracking-widest">TODAY</p>
-                                     <h3 class="font-bold text-gray-800 text-lg" id="today-text">13 กุมภาพันธ์ 2569</h3>
-                                 </div>
+                                 <div><p class="text-[10px] font-bold text-orange-400 uppercase tracking-widest">TODAY</p><h3 class="font-bold text-gray-800 text-lg" id="today-text">13 กุมภาพันธ์ 2569</h3></div>
                              </div>
                              <i class="fas fa-sun text-3xl text-orange-300"></i>
                         </div>
@@ -704,6 +736,16 @@
                                     <p class="text-sm text-orange-800">การแข่งขันหุ่นยนต์ประจำปี 2026</p>
                                 </div>
                             </div>
+                            
+                            <!-- Event 19-23 Mar -->
+                            <div class="relative pl-8 group">
+                                <div class="absolute left-[13px] top-2 w-4 h-4 rounded-full bg-white border-4 border-gray-400 z-10 shadow-sm group-hover:scale-125 transition-transform"></div>
+                                <span class="text-xs font-bold text-gray-500 mb-1.5 block uppercase tracking-wide">19-23 มี.ค. 2569</span>
+                                <div class="bg-white p-5 rounded-3xl border border-gray-100 shadow-sm">
+                                    <h4 class="font-bold text-gray-800">รับสมัครนักเรียนใหม่</h4>
+                                    <p class="text-sm text-gray-500">ปีการศึกษา 2569 (ห้องเรียนปกติ)</p>
+                                </div>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -713,13 +755,8 @@
                     <div class="glass-card rounded-[32px] p-6 sticky top-24 border border-white/60">
                         <h3 class="font-bold text-gray-900 mb-4">ดาวน์โหลด</h3>
                         <a href="https://drive.google.com/drive/folders/0B-71egBy6VpfODJ4UDFBTlFnNzQ?resourcekey=0-gR-ZR5JKHEMlCI8Jd7bvaQ" target="_blank" class="flex items-center p-4 rounded-2xl bg-white border border-gray-100 hover:shadow-md transition-all group mb-4">
-                            <div class="w-10 h-10 rounded-xl bg-red-50 text-red-500 flex items-center justify-center mr-3 group-hover:bg-red-500 group-hover:text-white transition-colors">
-                                <i class="fas fa-file-pdf"></i>
-                            </div>
-                            <div>
-                                <span class="font-bold text-gray-800 text-sm block">ปฏิทินวิชาการฉบับเต็ม</span>
-                                <span class="text-xs text-gray-400">PDF File</span>
-                            </div>
+                            <div class="w-10 h-10 rounded-xl bg-red-100 text-red-500 flex items-center justify-center mr-3"><i class="fas fa-file-pdf"></i></div>
+                            <div><span class="font-bold text-gray-800 text-sm block">ปฏิทินวิชาการฉบับเต็ม</span><span class="text-xs text-gray-400">PDF File</span></div>
                         </a>
                     </div>
                 </div>
@@ -730,32 +767,14 @@
         <div id="section-students" class="tab-content hidden">
             <div class="glass-card rounded-[32px] overflow-hidden shadow-xl border border-white/60">
                 <div class="p-8 bg-white border-b border-gray-100 flex flex-col sm:flex-row justify-between items-center gap-4">
-                    <div class="flex items-center">
-                        <div class="w-12 h-12 rounded-full bg-gray-100 flex items-center justify-center mr-4 text-gray-500 text-xl">
-                            <i class="fas fa-user-graduate"></i>
-                        </div>
-                        <div>
-                            <h2 class="text-2xl font-bold text-gray-900">รายชื่อเพื่อน ม.5/6</h2>
-                            <p class="text-gray-500 text-sm font-medium">ปีการศึกษา 2568 (40 คน)</p>
-                        </div>
-                    </div>
-                    <div class="px-5 py-2 rounded-2xl bg-gray-50 border border-gray-100 text-sm font-medium text-gray-600">
-                        ครูที่ปรึกษา: <span class="text-blue-600 font-bold">ครูประจำชั้น</span>
-                    </div>
+                    <div><h2 class="text-2xl font-bold text-gray-900">รายชื่อเพื่อน ม.5/6</h2><p class="text-gray-500 text-sm font-medium">ปีการศึกษา 2568 (40 คน)</p></div>
+                    <div class="px-5 py-2 rounded-2xl bg-gray-50 border border-gray-100 text-sm font-medium text-gray-600">ครูที่ปรึกษา: <span class="text-blue-600 font-bold">ครูประจำชั้น</span></div>
                 </div>
-                
                 <div class="bg-white/70 p-0 backdrop-blur-sm">
                     <div class="overflow-x-auto">
                         <table class="w-full text-left border-collapse">
-                            <thead>
-                                <tr class="bg-gray-50/80 text-gray-500 text-xs uppercase tracking-wider border-b border-gray-100 font-semibold">
-                                    <th class="px-6 py-4 w-24 text-center">#</th>
-                                    <th class="px-6 py-4">ชื่อ - นามสกุล</th>
-                                    <th class="px-6 py-4 w-32 text-center">สถานะ</th>
-                                </tr>
-                            </thead>
+                            <thead><tr class="bg-gray-50/80 text-gray-500 text-xs uppercase tracking-wider border-b border-gray-100 font-semibold"><th class="px-6 py-4 w-24 text-center">#</th><th class="px-6 py-4">ชื่อ - นามสกุล</th><th class="px-6 py-4 w-32 text-center">สถานะ</th></tr></thead>
                             <tbody class="divide-y divide-gray-50">
-                                <!-- Data maintained -->
                                 <tr class="hover:bg-blue-50/50 transition-colors"><td class="px-6 py-3 text-center font-bold text-gray-400">1</td><td class="px-6 py-3 font-medium text-gray-700">นางสาวกมลลักษณ์ สถานพงษ์</td><td class="px-6 py-3 text-center"><span class="px-2.5 py-1 bg-green-100 text-green-700 text-[10px] rounded-full font-bold">ปกติ</span></td></tr>
                                 <tr class="hover:bg-blue-50/50 transition-colors"><td class="px-6 py-3 text-center font-bold text-gray-400">2</td><td class="px-6 py-3 font-medium text-gray-700">นางสาวชาลิสา สบายดี</td><td class="px-6 py-3 text-center"><span class="px-2.5 py-1 bg-green-100 text-green-700 text-[10px] rounded-full font-bold">ปกติ</span></td></tr>
                                 <tr class="hover:bg-blue-50/50 transition-colors"><td class="px-6 py-3 text-center font-bold text-gray-400">3</td><td class="px-6 py-3 font-medium text-gray-700">นางสาวปทิตตา ระงับภัย</td><td class="px-6 py-3 text-center"><span class="px-2.5 py-1 bg-green-100 text-green-700 text-[10px] rounded-full font-bold">ปกติ</span></td></tr>
@@ -815,51 +834,91 @@
     </footer>
 
     <script>
-        function showSection(sectionId) {
-            // Hide all first
-            document.querySelectorAll('.tab-content').forEach(section => {
-                section.classList.add('hidden');
-            });
+        // --- SETTINGS & THEME LOGIC ---
+        function toggleSettings() {
+            const modal = document.getElementById('settings-modal');
+            const content = document.getElementById('settings-content');
             
-            // Show target
-            const target = document.getElementById('section-' + sectionId);
-            target.classList.remove('hidden');
-            
-            // Update nav state
-            updateNavState(sectionId);
-            
-            window.scrollTo({ top: 0, behavior: 'smooth' });
-        }
-
-        // Sliding Marker Logic
-        function updateNavState(activeId) {
-            const activeLink = document.getElementById('link-' + activeId);
-            const marker = document.getElementById('nav-marker');
-            
-            if (activeLink && marker) {
-                // Remove active class from all
-                document.querySelectorAll('.nav-link').forEach(link => {
-                    link.classList.remove('text-gray-900', 'font-bold');
-                    link.classList.add('text-gray-500');
-                });
-                
-                // Add active style
-                activeLink.classList.remove('text-gray-500');
-                activeLink.classList.add('text-gray-900', 'font-bold');
-
-                // Move Marker
-                marker.style.width = activeLink.offsetWidth + 'px';
-                marker.style.left = activeLink.offsetLeft + 'px';
+            if (modal.classList.contains('hidden')) {
+                modal.classList.remove('hidden');
+                // Trigger reflow
+                void modal.offsetWidth;
+                modal.classList.remove('opacity-0');
+                content.classList.remove('scale-95');
+            } else {
+                modal.classList.add('opacity-0');
+                content.classList.add('scale-95');
+                setTimeout(() => {
+                    modal.classList.add('hidden');
+                }, 300);
             }
         }
 
-        function toggleMobileMenu() {
-            const menu = document.getElementById('mobile-menu');
-            menu.classList.toggle('hidden');
+        function setTheme(themeName) {
+            // Remove existing themes
+            document.body.classList.remove('theme-dark-red', 'theme-dark-purple');
+            
+            // Remove active state from buttons
+            document.querySelectorAll('.theme-btn').forEach(btn => btn.classList.remove('active'));
+            
+            if (themeName !== 'light') {
+                document.body.classList.add('theme-' + themeName);
+            }
+            
+            // Add active state to button
+            document.getElementById('btn-theme-' + themeName).classList.add('active');
+            
+            // Save to LocalStorage
+            localStorage.setItem('classhub-theme', themeName);
+        }
+
+        function loadTheme() {
+            const savedTheme = localStorage.getItem('classhub-theme') || 'light';
+            setTheme(savedTheme);
+        }
+
+        // --- NAVIGATION LOGIC ---
+        function showSection(sectionId) {
+            document.querySelectorAll('.tab-content').forEach(section => {
+                section.classList.add('hidden');
+            });
+            const target = document.getElementById('section-' + sectionId);
+            target.classList.remove('hidden');
+            updateNavState(sectionId);
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+
+        function updateNavState(activeId) {
+            const activeLink = document.getElementById('link-' + activeId);
+            const marker = document.getElementById('nav-marker');
+            if (activeLink && marker) {
+                document.querySelectorAll('.nav-link').forEach(link => {
+                    link.classList.remove('nav-text-active');
+                    link.classList.add('text-gray-500');
+                });
+                activeLink.classList.remove('text-gray-500');
+                activeLink.classList.add('nav-text-active');
+                marker.style.width = activeLink.offsetWidth + 'px';
+                marker.style.left = activeLink.offsetLeft + 'px';
+            }
+            
+            // Mobile State
+            const mobileLink = document.getElementById('mobile-link-' + activeId);
+            const mobileMarker = document.getElementById('mobile-nav-marker');
+            if (mobileLink && mobileMarker) {
+                document.querySelectorAll('.mobile-nav-link').forEach(link => {
+                    link.classList.remove('nav-text-active');
+                    link.classList.add('text-gray-500');
+                });
+                mobileLink.classList.remove('text-gray-500');
+                mobileLink.classList.add('nav-text-active');
+                mobileMarker.style.width = mobileLink.offsetWidth + 'px';
+                mobileMarker.style.left = mobileLink.offsetLeft + 'px';
+                mobileMarker.style.backgroundColor = 'var(--marker-bg)';
+            }
         }
 
         function selectMobileDay(day) {
-            // Logic to switch mobile tabs
             document.querySelectorAll('.mobile-day-content').forEach(content => content.classList.add('hidden'));
             const targetContent = document.getElementById('mobile-' + day);
             if(targetContent) targetContent.classList.remove('hidden');
@@ -875,64 +934,52 @@
                 'thu': 'bg-orange-400 text-white border-orange-400 shadow-md transform scale-105',
                 'fri': 'bg-blue-400 text-white border-blue-400 shadow-md transform scale-105'
             };
-            
             document.getElementById('tab-' + day).className = `mobile-tab flex-shrink-0 px-5 py-2.5 rounded-full text-sm font-bold transition-all ${colors[day]}`;
         }
 
-        /* --- DOOR ANIMATION SCRIPT --- */
+        /* --- INIT --- */
         document.addEventListener('DOMContentLoaded', function() {
-            // Initialize Nav Marker Position
+            loadTheme(); // Load saved theme
             setTimeout(() => updateNavState('home'), 100);
 
-            const overlay = document.getElementById('door-overlay');
-            const dateOptions = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
+            // Date & Mini Widget
             const today = new Date();
             if(document.getElementById('today-text')) {
-                document.getElementById('today-text').textContent = today.toLocaleDateString('th-TH', dateOptions);
+                document.getElementById('today-text').textContent = today.toLocaleDateString('th-TH', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' });
             }
-
             const miniEventWidget = document.getElementById('today-event-mini');
             if(miniEventWidget) {
                 miniEventWidget.innerHTML = `
                     <div class="flex items-start mb-3 pb-3 border-b border-gray-200/50">
-                        <div class="w-8 h-8 rounded-lg bg-green-100 flex items-center justify-center text-green-600 mr-3 flex-shrink-0">
-                            <i class="fas fa-school"></i>
-                        </div>
-                        <div>
-                            <p class="text-xs text-gray-500 font-medium uppercase tracking-wide">สถานะวันนี้</p>
-                            <p class="font-bold text-gray-800 text-sm">เรียนตามปกติ</p>
-                        </div>
+                        <div class="w-8 h-8 rounded-lg bg-green-100 flex items-center justify-center text-green-600 mr-3 flex-shrink-0"><i class="fas fa-school"></i></div>
+                        <div><p class="text-xs text-gray-500 font-medium uppercase tracking-wide">สถานะวันนี้</p><p class="font-bold text-gray-800 text-sm">เรียนตามปกติ</p></div>
                     </div>
                     <div class="flex items-start">
-                        <div class="w-8 h-8 rounded-lg bg-red-100 flex items-center justify-center text-red-500 mr-3 flex-shrink-0">
-                            <i class="fas fa-exclamation-circle"></i>
-                        </div>
-                        <div>
-                            <p class="text-xs text-gray-500 font-medium uppercase tracking-wide">เร็วๆ นี้</p>
-                            <p class="font-bold text-red-500 text-sm">สอบปลายภาค (2 มี.ค.)</p>
-                        </div>
+                        <div class="w-8 h-8 rounded-lg bg-red-100 flex items-center justify-center text-red-500 mr-3 flex-shrink-0"><i class="fas fa-exclamation-circle"></i></div>
+                        <div><p class="text-xs text-gray-500 font-medium uppercase tracking-wide">เร็วๆ นี้</p><p class="font-bold text-red-500 text-sm">สอบปลายภาค (2 มี.ค.)</p></div>
                     </div>
                 `;
             }
 
-            // Open Door on Load
-            setTimeout(() => {
-                overlay.classList.add('doors-open');
-            }, 600);
+            // Door Animation
+            const overlay = document.getElementById('door-overlay');
+            setTimeout(() => { overlay.classList.add('doors-open'); }, 600);
         });
 
-        // Function to trigger door close and redirect
+        // Door Reset on Back
+        window.addEventListener('pageshow', function(event) {
+            const overlay = document.getElementById('door-overlay');
+            if (event.persisted || !overlay.classList.contains('doors-open')) {
+                overlay.classList.remove('is-transitioning');
+                setTimeout(() => { overlay.classList.add('doors-open'); }, 100);
+            }
+        });
+
         function transitionToPage(url) {
             const overlay = document.getElementById('door-overlay');
-            
-            // Bring doors back to closed state
             overlay.classList.remove('doors-open');
             overlay.classList.add('is-transitioning');
-            
-            // Wait for animation (0.8s) then redirect
-            setTimeout(() => {
-                window.location.href = url;
-            }, 800); 
+            setTimeout(() => { window.location.href = url; }, 800); 
         }
     </script>
 </body>
