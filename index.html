@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ClassHub - ม.5/6 iOS Glass UI</title>
+    <title>WEB APEGEN-5</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
     <link href="https://fonts.googleapis.com/css2?family=Sarabun:wght@300;400;500;600;700&display=swap" rel="stylesheet">
@@ -38,22 +38,26 @@
             --accent-color: #007AFF;
             --table-hover: #f9fafb;
             --input-bg: #f3f4f6;
+            --tab-inactive: #6b7280;
+            --tab-active-text: #1f2937;
         }
 
         /* --- Dark Red Theme --- */
         body.theme-dark-red {
             --bg-color: #1a0505;
-            --text-main: #f3f4f6;
-            --text-sub: #9ca3af;
+            --text-main: #ffebeb;
+            --text-sub: #d1d5db;
             --glass-bg: rgba(40, 10, 10, 0.85);
             --glass-border: rgba(255, 100, 100, 0.2);
             --nav-bg: rgba(30, 5, 5, 0.9);
             --card-bg: rgba(45, 15, 15, 0.95);
-            --marker-bg: rgba(200, 50, 50, 1);
+            --marker-bg: #ef4444; /* Red accent for marker */
             --shadow-color: rgba(0, 0, 0, 0.8);
             --accent-color: #ef4444;
             --table-hover: rgba(255, 255, 255, 0.05);
             --input-bg: rgba(0, 0, 0, 0.3);
+            --tab-inactive: #9ca3af;
+            --tab-active-text: #ffffff;
             background-image: 
                 radial-gradient(at 0% 0%, rgba(153, 27, 27, 0.3) 0px, transparent 50%),
                 radial-gradient(at 100% 100%, rgba(127, 29, 29, 0.2) 0px, transparent 50%);
@@ -62,17 +66,19 @@
         /* --- Dark Purple Theme --- */
         body.theme-dark-purple {
             --bg-color: #0f0518;
-            --text-main: #e9d5ff;
-            --text-sub: #a8a29e;
+            --text-main: #f3e8ff;
+            --text-sub: #d8b4fe;
             --glass-bg: rgba(30, 15, 50, 0.85);
             --glass-border: rgba(168, 85, 247, 0.25);
             --nav-bg: rgba(20, 10, 35, 0.9);
             --card-bg: rgba(35, 20, 60, 0.95);
-            --marker-bg: rgba(147, 51, 234, 1);
+            --marker-bg: #a855f7; /* Purple accent for marker */
             --shadow-color: rgba(0, 0, 0, 0.8);
             --accent-color: #a855f7;
             --table-hover: rgba(255, 255, 255, 0.05);
             --input-bg: rgba(0, 0, 0, 0.3);
+            --tab-inactive: #c084fc;
+            --tab-active-text: #ffffff;
             background-image: 
                 radial-gradient(at 0% 0%, rgba(107, 33, 168, 0.3) 0px, transparent 50%),
                 radial-gradient(at 100% 0%, rgba(76, 29, 149, 0.3) 0px, transparent 50%);
@@ -132,6 +138,7 @@
             font-weight: 700 !important;
         }
         
+        /* Ensure marker text is white in dark themes */
         body.theme-dark-red .nav-text-active, 
         body.theme-dark-purple .nav-text-active {
             color: #ffffff !important;
@@ -245,7 +252,28 @@
         .tab-content { animation: fadeIn 0.5s cubic-bezier(0.25, 1, 0.5, 1); }
         @keyframes fadeIn { from { opacity: 0; transform: scale(0.98) translateY(10px); } to { opacity: 1; transform: scale(1) translateY(0); } }
         
-        /* --- Dark Mode Overrides to Fix White Spots --- */
+        /* --- Mobile Schedule Sliding Tabs --- */
+        #schedule-marker {
+            position: absolute;
+            background-color: var(--accent-color);
+            border-radius: 99px;
+            transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+            z-index: 1;
+            top: 4px;
+            bottom: 4px;
+            box-shadow: 0 2px 5px var(--shadow-color);
+        }
+        .schedule-tab {
+            position: relative;
+            z-index: 10;
+            color: var(--tab-inactive);
+            transition: color 0.3s;
+        }
+        .schedule-tab.active {
+            color: #ffffff;
+        }
+
+        /* --- Dark Mode Overrides to Fix White Spots & Visibility --- */
         body.theme-dark-red .bg-white, 
         body.theme-dark-purple .bg-white { 
             background-color: var(--card-bg) !important; 
@@ -253,35 +281,72 @@
             color: var(--text-main);
         }
         
-        body.theme-dark-red .text-gray-900, 
-        body.theme-dark-purple .text-gray-900,
-        body.theme-dark-red .text-gray-800, 
-        body.theme-dark-purple .text-gray-800,
-        body.theme-dark-red .text-gray-700, 
-        body.theme-dark-purple .text-gray-700 {
+        body.theme-dark-red .bg-white\/60, 
+        body.theme-dark-purple .bg-white\/60,
+        body.theme-dark-red .bg-white\/80,
+        body.theme-dark-purple .bg-white\/80,
+        body.theme-dark-red .bg-white\/40,
+        body.theme-dark-purple .bg-white\/40 {
+            background-color: rgba(20, 20, 20, 0.6) !important;
+            border-color: var(--glass-border) !important;
+        }
+
+        body.theme-dark-red .text-gray-900, body.theme-dark-purple .text-gray-900,
+        body.theme-dark-red .text-gray-800, body.theme-dark-purple .text-gray-800 {
             color: #ffffff !important;
         }
 
-        body.theme-dark-red .text-gray-600, 
-        body.theme-dark-purple .text-gray-600,
-        body.theme-dark-red .text-gray-500, 
-        body.theme-dark-purple .text-gray-500 {
-            color: #cccccc !important;
+        body.theme-dark-red .text-gray-700, body.theme-dark-purple .text-gray-700,
+        body.theme-dark-red .text-gray-600, body.theme-dark-purple .text-gray-600 {
+            color: #e5e5e5 !important;
+        }
+
+        body.theme-dark-red .text-gray-500, body.theme-dark-purple .text-gray-500,
+        body.theme-dark-red .text-gray-400, body.theme-dark-purple .text-gray-400 {
+            color: #a3a3a3 !important;
         }
 
         body.theme-dark-red .bg-gray-50, body.theme-dark-purple .bg-gray-50,
-        body.theme-dark-red .bg-gray-100, body.theme-dark-purple .bg-gray-100 {
-            background-color: rgba(255,255,255,0.1) !important;
+        body.theme-dark-red .bg-gray-50\/50, body.theme-dark-purple .bg-gray-50\/50,
+        body.theme-dark-red .bg-gray-100, body.theme-dark-purple .bg-gray-100,
+        body.theme-dark-red .bg-gray-100\/50, body.theme-dark-purple .bg-gray-100\/50 {
+            background-color: rgba(255,255,255,0.08) !important;
             color: #fff;
-        }
-
-        body.theme-dark-red .bg-white\/60, body.theme-dark-purple .bg-white\/60 {
-            background-color: rgba(0,0,0,0.4) !important;
+            border-color: rgba(255,255,255,0.1) !important;
         }
         
+        /* Fix Specific Colors in Dark Mode to ensure visibility */
+        body.theme-dark-red .text-blue-600, body.theme-dark-purple .text-blue-600 { color: #60a5fa !important; }
+        body.theme-dark-red .text-blue-500, body.theme-dark-purple .text-blue-500 { color: #3b82f6 !important; }
+        body.theme-dark-red .bg-blue-50, body.theme-dark-purple .bg-blue-50 { background-color: rgba(59, 130, 246, 0.2) !important; color: #fff !important; }
+        
+        body.theme-dark-red .text-green-600, body.theme-dark-purple .text-green-600 { color: #4ade80 !important; }
+        body.theme-dark-red .bg-green-50, body.theme-dark-purple .bg-green-50 { background-color: rgba(34, 197, 94, 0.2) !important; color: #fff !important; }
+        
+        body.theme-dark-red .text-orange-600, body.theme-dark-purple .text-orange-600 { color: #fb923c !important; }
+        body.theme-dark-red .bg-orange-50, body.theme-dark-purple .bg-orange-50 { background-color: rgba(249, 115, 22, 0.2) !important; color: #fff !important; }
+        
+        body.theme-dark-red .text-red-600, body.theme-dark-purple .text-red-600 { color: #f87171 !important; }
+        body.theme-dark-red .bg-red-50, body.theme-dark-purple .bg-red-50 { background-color: rgba(239, 68, 68, 0.2) !important; color: #fff !important; }
+        
+        body.theme-dark-red .text-purple-600, body.theme-dark-purple .text-purple-600 { color: #c084fc !important; }
+        body.theme-dark-red .bg-purple-50, body.theme-dark-purple .bg-purple-50 { background-color: rgba(168, 85, 247, 0.2) !important; color: #fff !important; }
+        
+        body.theme-dark-red .text-yellow-600, body.theme-dark-purple .text-yellow-600 { color: #facc15 !important; }
+        body.theme-dark-red .bg-yellow-50, body.theme-dark-purple .bg-yellow-50 { background-color: rgba(234, 179, 8, 0.2) !important; color: #fff !important; }
+        
+        body.theme-dark-red .text-pink-600, body.theme-dark-purple .text-pink-600 { color: #f472b6 !important; }
+        body.theme-dark-red .bg-pink-50, body.theme-dark-purple .bg-pink-50 { background-color: rgba(236, 72, 153, 0.2) !important; color: #fff !important; }
+
         /* Table overrides */
         body.theme-dark-red tr:hover, body.theme-dark-purple tr:hover {
             background-color: var(--table-hover) !important;
+        }
+        
+        /* Mobile Schedule Tab Container override for dark mode */
+        body.theme-dark-red .mobile-sched-container, body.theme-dark-purple .mobile-sched-container {
+            background-color: rgba(0,0,0,0.3) !important;
+            border-color: var(--glass-border) !important;
         }
     </style>
 </head>
@@ -488,6 +553,7 @@
                     <table class="w-full text-center border-collapse">
                         <thead><tr class="bg-gray-50/50 text-gray-500 text-xs uppercase tracking-wider font-semibold border-b border-gray-100"><th class="p-4 w-24">วัน</th><th class="p-4 border-l border-gray-100">1<br>08.40</th><th class="p-4 border-l border-gray-100">2<br>09.30</th><th class="p-4 border-l border-gray-100">3<br>10.20</th><th class="p-4 border-l border-gray-100">4<br>11.10</th><th class="p-4 border-l border-gray-100 bg-gray-100/30 w-20">5<br>12.00</th><th class="p-4 border-l border-gray-100">6<br>12.50</th><th class="p-4 border-l border-gray-100">7<br>13.40</th><th class="p-4 border-l border-gray-100">8<br>14.30</th><th class="p-4 border-l border-gray-100">9<br>15.20</th></tr></thead>
                         <tbody class="text-sm font-medium">
+                            <!-- All 5 Days -->
                             <tr class="border-b border-gray-100 hover:bg-white transition-colors">
                                 <td class="p-4 font-bold text-yellow-600 bg-yellow-50/40">จันทร์</td>
                                 <td class="p-2 border-l border-gray-100"><div class="font-bold text-gray-800">อ32102</div><div class="text-[10px] text-gray-400">ครูสาริกา</div><span class="inline-block mt-1 px-1.5 py-0.5 bg-gray-100 text-gray-500 text-[10px] rounded-md font-bold">323</span></td>
@@ -548,16 +614,24 @@
                         </tbody>
                     </table>
                 </div>
-                <!-- Mobile Schedule (Tabs Style) -->
+                
+                <!-- Mobile Schedule (Sliding Tabs) -->
                 <div class="md:hidden">
-                    <div class="flex overflow-x-auto bg-gray-50/50 p-2 gap-2 scrollbar-hide border-b border-gray-200">
-                        <button onclick="selectMobileDay('mon')" id="tab-mon" class="mobile-tab flex-shrink-0 px-5 py-2.5 rounded-full text-sm font-bold bg-yellow-400 text-white shadow-md transition-all">จันทร์</button>
-                        <button onclick="selectMobileDay('tue')" id="tab-tue" class="mobile-tab flex-shrink-0 px-5 py-2.5 rounded-full text-sm font-bold bg-white text-gray-500 border border-gray-200 transition-all">อังคาร</button>
-                        <button onclick="selectMobileDay('wed')" id="tab-wed" class="mobile-tab flex-shrink-0 px-5 py-2.5 rounded-full text-sm font-bold bg-white text-gray-500 border border-gray-200 transition-all">พุธ</button>
-                        <button onclick="selectMobileDay('thu')" id="tab-thu" class="mobile-tab flex-shrink-0 px-5 py-2.5 rounded-full text-sm font-bold bg-white text-gray-500 border border-gray-200 transition-all">พฤหัส</button>
-                        <button onclick="selectMobileDay('fri')" id="tab-fri" class="mobile-tab flex-shrink-0 px-5 py-2.5 rounded-full text-sm font-bold bg-white text-gray-500 border border-gray-200 transition-all">ศุกร์</button>
+                    <div class="mobile-sched-container rounded-xl p-1 border overflow-hidden mb-4 mx-4 bg-gray-100/50 border-gray-200/50">
+                        <div class="flex items-center relative">
+                            <!-- Sliding Marker -->
+                            <div id="schedule-marker"></div>
+                            
+                            <!-- Day Buttons -->
+                            <button onclick="selectMobileDay('mon')" id="tab-mon" class="schedule-tab flex-1 py-2 text-xs font-bold text-center">จันทร์</button>
+                            <button onclick="selectMobileDay('tue')" id="tab-tue" class="schedule-tab flex-1 py-2 text-xs font-bold text-center">อังคาร</button>
+                            <button onclick="selectMobileDay('wed')" id="tab-wed" class="schedule-tab flex-1 py-2 text-xs font-bold text-center">พุธ</button>
+                            <button onclick="selectMobileDay('thu')" id="tab-thu" class="schedule-tab flex-1 py-2 text-xs font-bold text-center">พฤหัส</button>
+                            <button onclick="selectMobileDay('fri')" id="tab-fri" class="schedule-tab flex-1 py-2 text-xs font-bold text-center">ศุกร์</button>
+                        </div>
                     </div>
-                    <div class="p-4 bg-gray-50/30 min-h-[300px]">
+
+                    <div class="px-4 pb-4 min-h-[300px]">
                         <!-- Content for Monday -->
                         <div id="mobile-mon" class="mobile-day-content space-y-3">
                              <div class="bg-white p-4 rounded-3xl shadow-sm border border-gray-100 flex justify-between items-center"><div><p class="text-[10px] font-bold text-gray-400 uppercase">08.40</p><p class="font-bold text-gray-800 text-lg">อ32102</p><p class="text-xs text-gray-500">ครูสาริกา</p></div><div class="bg-yellow-50 text-yellow-600 px-3 py-1.5 rounded-xl text-xs font-bold">323</div></div>
@@ -841,7 +915,6 @@
             
             if (modal.classList.contains('hidden')) {
                 modal.classList.remove('hidden');
-                // Trigger reflow
                 void modal.offsetWidth;
                 modal.classList.remove('opacity-0');
                 content.classList.remove('scale-95');
@@ -855,21 +928,17 @@
         }
 
         function setTheme(themeName) {
-            // Remove existing themes
             document.body.classList.remove('theme-dark-red', 'theme-dark-purple');
-            
-            // Remove active state from buttons
             document.querySelectorAll('.theme-btn').forEach(btn => btn.classList.remove('active'));
-            
             if (themeName !== 'light') {
                 document.body.classList.add('theme-' + themeName);
             }
-            
-            // Add active state to button
             document.getElementById('btn-theme-' + themeName).classList.add('active');
-            
-            // Save to LocalStorage
             localStorage.setItem('classhub-theme', themeName);
+            
+            // Re-render schedule marker to update color
+            const currentDay = localStorage.getItem('current-mobile-day') || 'mon';
+            selectMobileDay(currentDay);
         }
 
         function loadTheme() {
@@ -902,7 +971,6 @@
                 marker.style.left = activeLink.offsetLeft + 'px';
             }
             
-            // Mobile State
             const mobileLink = document.getElementById('mobile-link-' + activeId);
             const mobileMarker = document.getElementById('mobile-nav-marker');
             if (mobileLink && mobileMarker) {
@@ -919,30 +987,59 @@
         }
 
         function selectMobileDay(day) {
-            document.querySelectorAll('.mobile-day-content').forEach(content => content.classList.add('hidden'));
-            const targetContent = document.getElementById('mobile-' + day);
-            if(targetContent) targetContent.classList.remove('hidden');
-
-            document.querySelectorAll('.mobile-tab').forEach(tab => {
-                tab.className = 'mobile-tab flex-shrink-0 px-5 py-2.5 rounded-full text-sm font-bold bg-white text-gray-500 border border-gray-200 transition-all hover:bg-gray-50';
+            localStorage.setItem('current-mobile-day', day);
+            
+            // 1. Switch Content with Fade Animation
+            document.querySelectorAll('.mobile-day-content').forEach(content => {
+                content.classList.add('hidden');
+                content.classList.remove('animate-fade-in-right');
             });
+            
+            const targetContent = document.getElementById('mobile-' + day);
+            if(targetContent) {
+                targetContent.classList.remove('hidden');
+                // Trigger reflow for animation
+                void targetContent.offsetWidth;
+                targetContent.classList.add('animate-fade-in-right');
+            }
 
-            const colors = {
-                'mon': 'bg-yellow-400 text-white border-yellow-400 shadow-md transform scale-105',
-                'tue': 'bg-pink-400 text-white border-pink-400 shadow-md transform scale-105',
-                'wed': 'bg-green-400 text-white border-green-400 shadow-md transform scale-105',
-                'thu': 'bg-orange-400 text-white border-orange-400 shadow-md transform scale-105',
-                'fri': 'bg-blue-400 text-white border-blue-400 shadow-md transform scale-105'
-            };
-            document.getElementById('tab-' + day).className = `mobile-tab flex-shrink-0 px-5 py-2.5 rounded-full text-sm font-bold transition-all ${colors[day]}`;
+            // 2. Move Marker
+            const activeTab = document.getElementById('tab-' + day);
+            const marker = document.getElementById('schedule-marker');
+            
+            if (activeTab && marker) {
+                // Reset text colors
+                document.querySelectorAll('.schedule-tab').forEach(t => {
+                    t.classList.remove('active');
+                });
+                
+                activeTab.classList.add('active');
+                marker.style.width = activeTab.offsetWidth + 'px';
+                marker.style.left = activeTab.offsetLeft + 'px';
+            }
         }
+
+        // Add keyframe for content sliding
+        const styleSheet = document.createElement("style");
+        styleSheet.innerText = `
+            @keyframes fadeInRight {
+                from { opacity: 0; transform: translateX(10px); }
+                to { opacity: 1; transform: translateX(0); }
+            }
+            .animate-fade-in-right {
+                animation: fadeInRight 0.3s ease-out forwards;
+            }
+        `;
+        document.head.appendChild(styleSheet);
 
         /* --- INIT --- */
         document.addEventListener('DOMContentLoaded', function() {
-            loadTheme(); // Load saved theme
+            loadTheme();
             setTimeout(() => updateNavState('home'), 100);
+            
+            // Init mobile schedule tab
+            setTimeout(() => selectMobileDay('mon'), 200);
 
-            // Date & Mini Widget
             const today = new Date();
             if(document.getElementById('today-text')) {
                 document.getElementById('today-text').textContent = today.toLocaleDateString('th-TH', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' });
@@ -961,12 +1058,10 @@
                 `;
             }
 
-            // Door Animation
             const overlay = document.getElementById('door-overlay');
             setTimeout(() => { overlay.classList.add('doors-open'); }, 600);
         });
 
-        // Door Reset on Back
         window.addEventListener('pageshow', function(event) {
             const overlay = document.getElementById('door-overlay');
             if (event.persisted || !overlay.classList.contains('doors-open')) {
